@@ -7,13 +7,13 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/api/v1/")
+@RequestMapping("/api/v1/messages")
 public class MessageController {
 
     @Autowired
     private MessageRepository messagerep;
 
-    @GetMapping("messages")
+    @GetMapping("/")
     public List<Message> getAlMessages() {
         return messagerep.findAll();
     }
