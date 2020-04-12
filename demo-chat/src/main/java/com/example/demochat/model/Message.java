@@ -1,4 +1,4 @@
-package com.example.demochat;
+package com.example.demochat.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

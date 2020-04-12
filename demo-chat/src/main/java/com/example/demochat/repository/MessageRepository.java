@@ -1,5 +1,6 @@
-package com.example.demochat;
+package com.example.demochat.repository;
 
+import com.example.demochat.model.Message;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
