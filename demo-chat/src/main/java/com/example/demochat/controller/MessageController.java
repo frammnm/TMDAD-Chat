@@ -19,6 +19,7 @@ public class MessageController {
     @Autowired
     private MessageRepository messagerep;
 
+    @Autowired
     private SimpMessageSendingOperations op;
 
     @GetMapping("/")
@@ -29,16 +30,30 @@ public class MessageController {
     @MessageMapping("/message")
     public void sendMessage(Message m) {
         //send message using the broker
+        System.out.println(m);
+        System.out.println(m.getId());
+        System.out.println(m.getBody());
+        System.out.println(m.getFrom());
+        System.out.println(m.getTo());
+        System.out.println(m.getTimestamp());
+
         Map<String,Object> map = new HashMap<>();
         map.put(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON);
-        op.convertAndSend("/queue/" + m.getTo(), m.getBody(), map);
+        op.convertAndSend("/queue/" + m.getTo(), m, map);
 
         //save in db
 //        messagerep.save(m);
     }
 
     @PostMapping("/send")
-    public void sendMessageHTTP(Message m) {
-        messagerep.save(m);
+    public Message sendMessageHTTP(@RequestBody Message m) {
+        System.out.println(m);
+        System.out.println(m.getId());
+        System.out.println(m.getBody());
+        System.out.println(m.getFrom());
+        System.out.println(m.getTo());
+        System.out.println(m.getTimestamp());
+        return messagerep.save(new Message(m.getId(), m.getBody(), m.getFrom(), m.getTo(), m.getTimestamp()));
+//        return m;
     }
 }

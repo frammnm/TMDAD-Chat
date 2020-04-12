@@ -31,7 +31,8 @@ public class Message {
     super();
   }
 
-  public Message(String body, String from, String to, String timestamp) {
+  public Message(long id, String body, String from, String to, String timestamp) {
+    this.id = id;
     this.body = body;
     this.from = from;
     this.to = to;

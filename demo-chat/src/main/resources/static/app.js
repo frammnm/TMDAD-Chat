@@ -20,7 +20,8 @@ function connect() {
         setConnected(true);
         console.log('Connected: ' + frame);
         stompClient.subscribe('/queue/'+username, function (query) {
-            showMessage(JSON.parse(query.body).content);
+                console.log(query);
+                showMessage(JSON.parse(query.body).content);
         });
     });
 }
