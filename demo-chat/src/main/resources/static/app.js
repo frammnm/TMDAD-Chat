@@ -85,6 +85,8 @@ function getOldMessages(){
 }
 
 $(function () {
+    setConnected(false);
+
     $("form").on('submit', function (e) {
         e.preventDefault();
     });
