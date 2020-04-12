@@ -18,11 +18,11 @@ public class Message {
   @Column(name = "body")
   private String body;
 
-  @Column(name = "from")
-  private String from;
+  @Column(name = "sent_from")
+  private String sent_from;
 
-  @Column(name = "to")
-  private String to;
+  @Column(name = "sent_to")
+  private String sent_to;
 
   @Column(name = "timestamp")
   private String timestamp;
@@ -31,11 +31,11 @@ public class Message {
     super();
   }
 
-  public Message(long id, String body, String from, String to, String timestamp) {
-    this.id = id;
+  public Message(String body, String sent_from, String sent_to, String timestamp) {
+//    this.id = id;
     this.body = body;
-    this.from = from;
-    this.to = to;
+    this.sent_from = sent_from;
+    this.sent_to = sent_to;
     this.timestamp = timestamp;
   }
 
@@ -56,19 +56,19 @@ public class Message {
   }
 
   public String getFrom() {
-    return from;
+    return sent_from;
   }
 
   public void setFrom(String from) {
-    this.from = from;
+    this.sent_from = from;
   }
 
   public String getTo() {
-    return to;
+    return sent_to;
   }
 
   public void setTo(String to) {
-    this.to = to;
+    this.sent_to = to;
   }
 
   public String getTimestamp() {

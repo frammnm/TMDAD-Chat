@@ -42,7 +42,7 @@ public class MessageController {
         op.convertAndSend("/queue/" + m.getTo(), m, map);
 
         //save in db
-//        messagerep.save(m);
+        messagerep.save(m);
     }
 
     @PostMapping("/send")
@@ -53,7 +53,7 @@ public class MessageController {
         System.out.println(m.getFrom());
         System.out.println(m.getTo());
         System.out.println(m.getTimestamp());
-        return messagerep.save(new Message(m.getId(), m.getBody(), m.getFrom(), m.getTo(), m.getTimestamp()));
+        return messagerep.save(new Message(m.getBody(), m.getFrom(), m.getTo(), m.getTimestamp()));
 //        return m;
     }
 }
