@@ -39,7 +39,7 @@ public class MessageController {
 
         Map<String,Object> map = new HashMap<>();
         map.put(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON);
-        op.convertAndSend("/queue/" + m.getTo(), m, map);
+        op.convertAndSend("/topic/" + m.getTo(), m, map);
 
         //save in db
         messagerep.save(m);
