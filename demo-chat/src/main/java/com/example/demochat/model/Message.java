@@ -1,11 +1,8 @@
 package com.example.demochat.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "messages")
@@ -27,12 +24,15 @@ public class Message {
   @Column(name = "timestamp")
   private String timestamp;
 
+  @ManyToOne
+  @JoinColumn(name="group_id")
+  private Group group;
+
   public Message() {
     super();
   }
 
   public Message(String body, String sent_from, String sent_to, String timestamp) {
-//    this.id = id;
     this.body = body;
     this.sent_from = sent_from;
     this.sent_to = sent_to;
