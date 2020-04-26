@@ -1,12 +1,12 @@
 package com.example.demochat.model;
 
 import javax.persistence.*;
-
+import java.io.Serializable;
 import java.util.List;
 
 @Entity
 @Table(name = "messages")
-public class Message {
+public class Message implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

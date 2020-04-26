@@ -1,11 +1,17 @@
 package com.example.demochat.model;
 
 import javax.persistence.*;
+import com.fasterxml.jackson.annotation.*;
 import java.util.List;
+import java.util.Random;
+import java.time.Instant;
+import java.lang.Math;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "groups")
-public class Group {
+@JsonIdentityInfo( generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+public class Group implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,10 +20,11 @@ public class Group {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "owner")
-    private String owner;
+    @ManyToOne
+    @JoinColumn(name="owner")
+    private User owner;
 
-    @Column(name = "url")
+    @Column(name = "url", unique = true)
     private String url;
 
     @Column(name = "messages")
@@ -27,9 +34,13 @@ public class Group {
     @ManyToMany(mappedBy = "groups")
     private List<User> members;
 
-    public Group(String name, String owner) {
+    public Group(String name, User owner) {
         this.name = name;
         this.owner = owner;
+
+        Random rand = new Random();
+        rand.setSeed(Instant.now().getEpochSecond());
+        this.url = "/groups/" + name + Math.abs(rand.nextInt());
     }
 
     public Group() {
@@ -52,11 +63,11 @@ public class Group {
         this.name = name;
     }
 
-    public String getOwner() {
+    public User getOwner() {
         return owner;
     }
 
-    public void setOwner(String owner) {
+    public void setOwner(User owner) {
         this.owner = owner;
     }
 
