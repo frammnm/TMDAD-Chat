@@ -34,6 +34,11 @@ public class UserController {
         return users.save(new User(u.getUsername(), u.getPassword()));
     }
 
+//    @PostMapping("/login")
+//    public User createUser(@RequestBody Login lg) {
+//        return users.findById(lg.getUsername(), lg.getPassword());
+//    }
+
     @GetMapping("/{id}")
     public User getUser(@PathVariable long id) {
         return users.findById(id).orElse(null);
