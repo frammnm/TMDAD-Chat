@@ -1,4 +1,4 @@
-package com.example.demochat;
+package com.example.demochat.configuration;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -12,13 +12,21 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/queue");
+        config.enableSimpleBroker("/topic");
         config.setApplicationDestinationPrefixes("/app");
+        /*
+        config.enableStompBrokerRelay("/topic")
+                .setRelayHost("rattlesnake.rmq.cloudamqp.com")
+                .setRelayPort(61613)
+                .setSystemLogin("ioaosasv")
+                .setSystemPasscode("0xE-99cOXc4shQndNSyyQIQp1wmycwL9")
+                .setVirtualHost("ioaosasv");
+         */
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/broker").withSockJS();
+        registry.addEndpoint("/stomp").withSockJS();
     }
 
 }
