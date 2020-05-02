@@ -32,6 +32,9 @@
         <div class="col-sm-2">
             <button class="btn btn-secondary" type="button" data-toggle="modal" data-target="#sendMessageModal" data-sending="file">Enviar Archivo</button>
         </div>
+        <div class="col-sm-3">
+            <button class="btn btn-secondary" type="button" data-toggle="modal" data-target="#sendMessageModal" data-sending="textAll">Enviar Mensaje a Todos</button>
+        </div>
     </div>
     <br>
     <div class="row">
@@ -64,7 +67,7 @@
             </div>
             <div class="modal-body">
                 <form>
-                    <div class="form-group">
+                    <div class="form-group" id="textRecipientField">
                         <label for="recipient-name" class="col-form-label">Receptor:</label>
                         <input type="text" class="form-control" id="recipient-name">
                     </div>
