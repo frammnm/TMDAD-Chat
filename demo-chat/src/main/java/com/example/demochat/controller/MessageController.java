@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.example.demochat.model.Message;
 import com.example.demochat.repository.MessageRepository;
+import com.example.demochat.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.messaging.MessageHeaders;
@@ -17,43 +18,20 @@ import java.util.Map;
 public class MessageController {
 
     @Autowired
-    private MessageRepository messagerep;
-
-    @Autowired
-    private SimpMessageSendingOperations op;
+    private MessageService messageService;
 
     @GetMapping("/")
     public List<Message> getAllMessages() {
-        return messagerep.findAll();
+        return messageService.getAllMessages();
     }
 
     @MessageMapping("/message")
     public void sendMessage(Message m) {
-        //send message using the broker
-        System.out.println(m);
-        System.out.println(m.getId());
-        System.out.println(m.getBody());
-        System.out.println(m.getFrom());
-        System.out.println(m.getTo());
-        System.out.println(m.getTimestamp());
-
-        Map<String,Object> map = new HashMap<>();
-        map.put(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON);
-        op.convertAndSend("/topic/" + m.getTo(), m, map);
-
-        //save in db
-        messagerep.save(m);
+        messageService.sendMessage(m);
     }
 
     @PostMapping("/send")
     public Message sendMessageHTTP(@RequestBody Message m) {
-        System.out.println(m);
-        System.out.println(m.getId());
-        System.out.println(m.getBody());
-        System.out.println(m.getFrom());
-        System.out.println(m.getTo());
-        System.out.println(m.getTimestamp());
-        return messagerep.save(new Message(m.getBody(), m.getFrom(), m.getTo(), m.getTimestamp()));
-//        return m;
+        return messageService.sendMessageHTTP(m);
     }
 }

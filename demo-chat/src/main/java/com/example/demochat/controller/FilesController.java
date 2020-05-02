@@ -8,7 +8,10 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 import com.example.demochat.model.Message;
+import com.example.demochat.service.MessageService;
 import jdk.internal.loader.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -22,7 +25,11 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @RequestMapping("/files")
 public class FilesController {
 
-    private String filesBasePath = "files/";
+    @Autowired
+    private MessageService messageService;
+
+    @Value("${spring.chat.filepath}")
+    private String filesBasePath;
 
     @PostMapping("/upload")
     public ResponseEntity uploadToLocalFileSystem(@RequestPart("file") MultipartFile file, @RequestPart("message") Message m) {
@@ -38,6 +45,10 @@ public class FilesController {
                 .path("/files/download/")
                 .path(fileName)
                 .toUriString();
+
+        m.setBody(fileDownloadUri);
+        messageService.sendMessage(m);
+
         return ResponseEntity.ok(fileDownloadUri);
     }
 

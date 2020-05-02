@@ -27,7 +27,7 @@ function connect() {
     stompClient.connect({}, function (frame) {
         setConnected(true);
         console.log('Connected: ' + frame);
-        stompClient.subscribe('/topic/'+username, function (message) {
+        stompClient.subscribe('/queue/'+username, function (message) {
                 console.log(message);
                 showMessage(JSON.parse(message.body));
         });
@@ -126,7 +126,7 @@ $(function () {
     $("form").on('submit', function (e) {
         e.preventDefault();
     });
-    $( "#connect" ).click(function() { connect(); getOldMessages();});
+    $( "#connect" ).click(function() { connect();});
     $( "#disconnect" ).click(function() { disconnect(); });
     $( "#send" ).click(function() { sendMessage(); $('#sendMessageModal').modal('hide')});
 

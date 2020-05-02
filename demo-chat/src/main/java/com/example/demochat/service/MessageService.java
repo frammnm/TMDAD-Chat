@@ -1,0 +1,11 @@
+package com.example.demochat.service;
+
+import com.example.demochat.model.Message;
+
+import java.util.List;
+
+public interface MessageService {
+    public abstract List<Message> getAllMessages();
+    public abstract void sendMessage(Message m);
+    public abstract Message sendMessageHTTP(Message m);
+}
