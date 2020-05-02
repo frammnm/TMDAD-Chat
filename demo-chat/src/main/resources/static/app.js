@@ -31,6 +31,11 @@ function connect() {
                 console.log(message);
                 showMessage(JSON.parse(message.body));
         });
+
+        stompClient.subscribe('/topic/all', function (message) {
+            console.log(message);
+            showMessage(JSON.parse(message.body));
+        });
     });
 }
 
@@ -52,11 +57,19 @@ function sendMessage() {
         timestamp: Date.now()
     }
 
-    if (sendType == 'file') {
-        uploadFile(message);
-    }else{
-        //Send text message
-        stompClient.send("/app/message", {}, JSON.stringify(message));
+    switch(sendType) {
+        case 'file':
+            uploadFile(message);
+            break;
+        case 'textAll':
+            message.to = 'all';
+            //Send text message
+            stompClient.send("/app/messageAll", {}, JSON.stringify(message));
+            break;
+        default:
+            //case: text
+            //Send text message
+            stompClient.send("/app/message", {}, JSON.stringify(message));
     }
 }
 
@@ -137,14 +150,26 @@ $(function () {
 
         modal.data("sending-type", sendType);
 
-        if (sendType == "text") {
-            $("#textFormField").show();
-            $("#fileFormField").hide();
+        switch(sendType) {
+            case "file":
+                $("#fileFormField").show();
+                $("#textRecipientField").show();
+                $("#textFormField").hide();
+                break;
+            case "textAll":
+                $("#textFormField").show();
+                $("#textRecipientField").hide();
+                $("#fileFormField").hide();
 
-            modal.find('.modal-body textarea').val('');
-        }else{
-            $("#fileFormField").show();
-            $("#textFormField").hide();
+                modal.find('.modal-body textarea').val('');
+                break;
+            default:
+                //case: text
+                $("#textFormField").show();
+                $("#textRecipientField").show();
+                $("#fileFormField").hide();
+
+                modal.find('.modal-body textarea').val('');
         }
 
         // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).

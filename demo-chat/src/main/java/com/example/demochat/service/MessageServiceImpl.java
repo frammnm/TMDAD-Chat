@@ -45,6 +45,24 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
+    public void broadcastMessage(Message m) {
+        //send message using the broker
+        System.out.println(m);
+        System.out.println(m.getId());
+        System.out.println(m.getBody());
+        System.out.println(m.getFrom());
+        System.out.println(m.getTo());
+        System.out.println(m.getTimestamp());
+
+        Map<String,Object> map = new HashMap<>();
+        map.put(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON);
+        op.convertAndSend("/topic/all", m, map);
+
+        //save in db
+        messagerep.save(m);
+    }
+
+    @Override
     public Message sendMessageHTTP(Message m) {
         System.out.println(m);
         System.out.println(m.getId());

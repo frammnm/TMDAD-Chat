@@ -30,6 +30,11 @@ public class MessageController {
         messageService.sendMessage(m);
     }
 
+    @MessageMapping("/messageAll")
+    public void broadcastMessage(Message m) {
+        messageService.broadcastMessage(m);
+    }
+
     @PostMapping("/send")
     public Message sendMessageHTTP(@RequestBody Message m) {
         return messageService.sendMessageHTTP(m);

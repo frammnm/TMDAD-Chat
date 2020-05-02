@@ -7,5 +7,6 @@ import java.util.List;
 public interface MessageService {
     public abstract List<Message> getAllMessages();
     public abstract void sendMessage(Message m);
+    public abstract void broadcastMessage(Message m);
     public abstract Message sendMessageHTTP(Message m);
 }
