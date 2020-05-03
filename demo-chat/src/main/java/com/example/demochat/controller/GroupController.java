@@ -34,11 +34,6 @@ public class GroupController {
 
     @PostMapping("/create")
     public Group createGroup(@RequestBody Group u) {
-//        User owner = users.findById(u.getOwner()).orElse(null);
-//        if (owner == null) { return null;};
-//        Group newGroup = new Group(u.getName(), owner);
-//        owner.setGroups(owner.getGroups().add(newGroup));
-//        return groups.save(newGroup);
         System.out.println("####################################");
         System.out.println(u.getName());
         System.out.println(u);
@@ -47,19 +42,52 @@ public class GroupController {
         return groups.save(new Group(u.getName(), u.getOwner()));
     }
 
-//    @GetMapping("/{id}")
-//    public User getUser(@PathVariable long id) {
-//        return users.findById(id).orElse(null);
-//    }
-//
-//    @PutMapping("/{id}")
-//    public User updateUser(@RequestBody User u) {
-//        return users.save(u);
-//    }
-//
-//    @DeleteMapping("/{id}")
-//    public void deleteUser(@PathVariable long id) {
-//        users.deleteById(id);
-//    }
+    @GetMapping("/{id}")
+    public Group getGroup(@PathVariable long id) {
+        return groups.findById(id).orElse(null);
+    }
+
+    @PutMapping("/{id}")
+    public Group updateGroup(@RequestBody Group g) {
+        return groups.save(g);
+    }
+
+    @GetMapping("/{id}/messages")
+    public List<Message> getGroupMessages(@PathVariable long id) {
+        Group group = groups.findById(id).orElse(null);
+
+        if (group == null) {
+            return null;
+        }
+
+        return group.getMessages();
+    }
+
+    @PutMapping("/addMember")
+    public Group addMemberToGroup(@RequestBody Map<String, Long> reqObject) {
+        Group currentGroup = groups.findById(reqObject.get("group_id")).orElse(null);
+        User user = users.findById(reqObject.get("member_id")).orElse(null);
+
+        if ((user == null) || (currentGroup == null)) {
+            return null;
+        } else {
+
+            List<User> currentMembers = currentGroup.getMembers();
+            currentMembers.add(user);
+            currentGroup.setMembers(currentMembers);
+
+            List<Group> userGroups = user.getGroups();
+            userGroups.add(currentGroup);
+            user.setGroups(userGroups);
+            users.save(user);
+        }
+
+        return groups.save(currentGroup);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteGroup(@PathVariable long id) {
+        groups.deleteById(id);
+    }
 
 }

@@ -17,7 +17,7 @@ public class Group implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "name")
+    @Column(name = "name",  unique = true)
     private String name;
 
     @ManyToOne
@@ -31,7 +31,7 @@ public class Group implements Serializable {
     @OneToMany(mappedBy = "group")
     private List<Message> messages;
 
-    @ManyToMany(mappedBy = "groups")
+    @ManyToMany(mappedBy = "groups", cascade = CascadeType.ALL)
     private List<User> members;
 
     public Group(String name, User owner) {

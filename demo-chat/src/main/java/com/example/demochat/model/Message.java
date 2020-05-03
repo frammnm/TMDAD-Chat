@@ -24,6 +24,7 @@ public class Message implements Serializable {
   @Column(name = "timestamp")
   private String timestamp;
 
+
   @ManyToOne
   @JoinColumn(name="group_id")
   private Group group;
@@ -77,5 +78,13 @@ public class Message implements Serializable {
 
   public void setTimestamp(String timestamp) {
     this.timestamp = timestamp;
+  }
+
+  public Group getGroup() {
+    return group;
+  }
+
+  public void setGroup(Group group) {
+    this.group = group;
   }
 }

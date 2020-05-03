@@ -30,6 +30,11 @@ public class MessageController {
         messageService.sendMessage(m);
     }
 
+    @MessageMapping("/groupMessage")
+    public void sendGroupMessage(Message m) {
+        messageService.sendGroupMessage(m);
+    }
+
     @MessageMapping("/messageAll")
     public void broadcastMessage(Message m) {
         messageService.broadcastMessage(m);
