@@ -33,10 +33,10 @@
             <button class="btn btn-secondary" type="button" data-toggle="modal" data-target="#sendMessageModal" data-sending="file">Enviar Archivo</button>
         </div>
         <div class="col-sm-3">
-            <button class="btn btn-secondary" type="button" data-toggle="modal" data-target="#sendMessageModal" data-sending="textAll">Enviar Mensaje a Todos</button>
+            <button class="btn btn-secondary" type="button" data-toggle="modal" data-target="#sendMessageModal" data-sending="textGroup">Enviar Mensaje a un grupo</button>
         </div>
         <div class="col-sm-3">
-            <button class="btn btn-secondary" type="button" data-toggle="modal" data-target="#sendMessageModal" data-sending="textGroup">Enviar Mensaje a un grupo</button>
+            <button class="btn btn-secondary" type="button" data-toggle="modal" data-target="#sendMessageModal" data-sending="textAll">Enviar Mensaje a Todos</button>
         </div>
     </div>
     <br>
@@ -75,6 +75,12 @@
                     <div class="form-group" id="textRecipientField">
                         <label for="recipient-name" class="col-form-label">Receptor:</label>
                         <input type="text" class="form-control" id="recipient-name">
+                    </div>
+                    <div class="form-group" id="groupRecipientField">
+                        <label for="groupRecipientField">Grupo:</label>
+                        <select class="form-control" id="recipient-group">
+                            <option value="none">Elige un grupo</option>
+                        </select>
                     </div>
                     <div class="form-group" id="textFormField">
                         <label for="message-text" class="col-form-label">Mensaje:</label>

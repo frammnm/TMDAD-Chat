@@ -65,9 +65,9 @@ function sendMessage() {
     let sendType = $('#sendMessageModal').data("sending-type");
 
     let message = {
-        from: $("#username").val(),
+        sent_from: $("#username").val(),
         body: $("#message-text").val(),
-        to: $("#recipient-name").val(),
+        sent_to: $("#recipient-name").val(),
         timestamp: Date.now()
     }
 
@@ -76,13 +76,16 @@ function sendMessage() {
             uploadFile(message);
             break;
         case 'textAll':
-            message.to = 'all';
+            message.sent_to = 'all';
             //Send text message
             stompClient.send("/app/messageAll", {}, JSON.stringify(message));
             break;
         case "textGroup":
-            //case: text
-            //Send text message
+            let sendTo = $("#recipient-group").val();
+            if (sendTo == 'none'){
+                return;
+            }
+            message.sent_to = sendTo;
             stompClient.send("/app/groupMessage", {}, JSON.stringify(message));
             break;
         default:
@@ -126,8 +129,8 @@ function showMessage(message) {
     let date = new Date(parseInt(message.timestamp));
     msgTemplate += "<td>"+ message.type +"</td>";
     msgTemplate += "<td>"+ date.getHours() + ":" + addZero(date.getMinutes()) +"</td>";
-    msgTemplate += "<td>"+ message.from +"</td>";
-    msgTemplate += "<td>"+ message.to +"</td>";
+    msgTemplate += "<td>"+ message.sent_from +"</td>";
+    msgTemplate += "<td>"+ message.sent_to +"</td>";
     msgTemplate += "<td>"+ message.body +"</td>";
     msgTemplate += "</tr>";
     $("#messages").append(msgTemplate);
@@ -141,7 +144,7 @@ function getUser(username){
         success: function(resultData) {
             user = resultData;
             console.log(user);
-            subscribeToGroups();
+            handleGroups();
         },
         error : function(jqXHR, textStatus, errorThrown) {
             console.log(errorThrown);
@@ -150,22 +153,28 @@ function getUser(username){
     });
 }
 
-function subscribeToGroups() {
-    if (user == null) {
+function handleGroups(){
+    if (user == null){
         return;
     }
 
-    //Subscribe to Group messages
-    user.groups.forEach(function (group) {
-        stompClient.subscribe('/topic/' + group.name, function (m) {
-            console.log(m);
-            let message = JSON.parse(m.body);
-            message.type = 'Grupo';
-            showMessage(message);
-        });
+    let belongGroups = user.groups;
+    let ownedGroups = user.ownedGroups;
+    let groups = belongGroups.concat(ownedGroups);
+    console.log(groups);
+
+    //Fill dropdown
+    let dropdown = $("#recipient-group");
+    groups.forEach(function (group) {
+        dropdown.append($("<option />").val(group.name).text(group.name));
     });
 
-    user.ownedGroups.forEach(function (group) {
+    subscribeToGroups(groups);
+}
+
+function subscribeToGroups(groups) {
+    //Subscribe to Group messages
+    groups.forEach(function (group) {
         stompClient.subscribe('/topic/' + group.name, function (m) {
             console.log(m);
             let message = JSON.parse(m.body);
@@ -184,8 +193,8 @@ function getOldMessages(){
             //console.log(resultData);
             let username = $("#username").val();
             resultData.forEach(function(message) {
-                if (message.to == username){
-                    message.to = 'Yo';
+                if (message.sent_to == username){
+                    message.sent_to = 'Yo';
                     message.type = 'Directo'
                     showMessage(message);
                 }
@@ -220,17 +229,19 @@ $(function () {
                 $("#fileFormField").show();
                 $("#textRecipientField").show();
                 $("#textFormField").hide();
+                $("#groupRecipientField").hide();
                 break;
             case "textAll":
                 $("#textFormField").show();
                 $("#textRecipientField").hide();
                 $("#fileFormField").hide();
-
+                $("#groupRecipientField").hide();
                 modal.find('.modal-body textarea').val('');
                 break;
             case "textGroup":
+                $("#groupRecipientField").show();
                 $("#textFormField").show();
-                $("#textRecipientField").show();
+                $("#textRecipientField").hide();
                 $("#fileFormField").hide();
 
                 modal.find('.modal-body textarea').val('');
@@ -240,6 +251,7 @@ $(function () {
                 $("#textFormField").show();
                 $("#textRecipientField").show();
                 $("#fileFormField").hide();
+                $("#groupRecipientField").hide();
 
                 modal.find('.modal-body textarea').val('');
         }
