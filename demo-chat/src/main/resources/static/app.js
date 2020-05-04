@@ -36,15 +36,19 @@ function connect() {
         getUser(username);
 
         //Subscribe to personal messages
-        stompClient.subscribe('/queue/'+username, function (message) {
-                console.log(message);
-                showMessage(JSON.parse(message.body));
+        stompClient.subscribe('/queue/'+username, function (m) {
+                console.log(m);
+                let message = JSON.parse(m.body);
+                message.type = 'Directo';
+                showMessage(message);
         });
 
         //Subscribe to system alerts
-        stompClient.subscribe('/topic/all', function (message) {
-            console.log(message);
-            showMessage(JSON.parse(message.body));
+        stompClient.subscribe('/topic/all', function (m) {
+            console.log(m);
+            let message = JSON.parse(m.body);
+            message.type = 'Aviso';
+            showMessage(message);
         });
     });
 }
@@ -120,8 +124,10 @@ function uploadFile(message) {
 function showMessage(message) {
     let msgTemplate = "<tr>";
     let date = new Date(parseInt(message.timestamp));
+    msgTemplate += "<td>"+ message.type +"</td>";
     msgTemplate += "<td>"+ date.getHours() + ":" + addZero(date.getMinutes()) +"</td>";
     msgTemplate += "<td>"+ message.from +"</td>";
+    msgTemplate += "<td>"+ message.to +"</td>";
     msgTemplate += "<td>"+ message.body +"</td>";
     msgTemplate += "</tr>";
     $("#messages").append(msgTemplate);
@@ -149,19 +155,22 @@ function subscribeToGroups() {
         return;
     }
 
+    //Subscribe to Group messages
     user.groups.forEach(function (group) {
-        //Subscribe to personal messages
-        stompClient.subscribe('/topic/' + group.name, function (message) {
-            console.log(message);
-            showMessage(JSON.parse(message.body));
+        stompClient.subscribe('/topic/' + group.name, function (m) {
+            console.log(m);
+            let message = JSON.parse(m.body);
+            message.type = 'Grupo';
+            showMessage(message);
         });
     });
 
     user.ownedGroups.forEach(function (group) {
-        //Subscribe to personal messages
-        stompClient.subscribe('/topic/' + group.name, function (message) {
-            console.log(message);
-            showMessage(JSON.parse(message.body));
+        stompClient.subscribe('/topic/' + group.name, function (m) {
+            console.log(m);
+            let message = JSON.parse(m.body);
+            message.type = 'Grupo';
+            showMessage(message);
         });
     });
 }
@@ -176,44 +185,11 @@ function getOldMessages(){
             let username = $("#username").val();
             resultData.forEach(function(message) {
                 if (message.to == username){
+                    message.to = 'Yo';
+                    message.type = 'Directo'
                     showMessage(message);
                 }
             });
-        },
-        error : function(jqXHR, textStatus, errorThrown) {
-            console.log(errorThrown);
-        },
-        timeout: defaultTimeout,
-    });
-}
-
-function createGroup(){
-
-    let group =     {
-        id: 17,
-        name: "test1",
-        owner: {
-            id: 1,
-            username: "francisco",
-            password: "admin1",
-            role: "admin",
-            groups: [],
-            ownedGroups: [
-                17
-            ]
-        },
-        url: "/groups/test11291253989",
-        messages: [],
-        members: []
-    }
-
-    $.ajax({
-        url: apiURL+"/groups/create",
-        type: "POST",
-        contentType: 'application/json; charset=utf-8',
-        data: group,
-        success: function(resultData) {
-            console.log(resultData);
         },
         error : function(jqXHR, textStatus, errorThrown) {
             console.log(errorThrown);
