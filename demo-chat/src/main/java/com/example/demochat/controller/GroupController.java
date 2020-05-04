@@ -71,7 +71,6 @@ public class GroupController {
         if ((user == null) || (currentGroup == null)) {
             return null;
         } else {
-
             List<User> currentMembers = currentGroup.getMembers();
             currentMembers.add(user);
             currentGroup.setMembers(currentMembers);
@@ -89,5 +88,4 @@ public class GroupController {
     public void deleteGroup(@PathVariable long id) {
         groups.deleteById(id);
     }
-
 }

@@ -34,6 +34,7 @@ public class UserController {
         return users.save(new User(u.getUsername(), u.getPassword()));
     }
 
+
 //    @PostMapping("/login")
 //    public User createUser(@RequestBody Login lg) {
 //        return users.findById(lg.getUsername(), lg.getPassword());
@@ -42,6 +43,11 @@ public class UserController {
     @GetMapping("/{id}")
     public User getUser(@PathVariable long id) {
         return users.findById(id).orElse(null);
+    }
+
+    @GetMapping("/byUsername/{username}")
+    public User getUser(@PathVariable String username) {
+        return users.findByUsername(username);
     }
 
     @PutMapping("/{id}")
@@ -53,5 +59,4 @@ public class UserController {
     public void deleteUser(@PathVariable long id) {
         users.deleteById(id);
     }
-
 }

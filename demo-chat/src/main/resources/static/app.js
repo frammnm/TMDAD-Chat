@@ -1,5 +1,9 @@
 var stompClient = null;
-var apiURL = "/api/v1/messages/";
+var apiURL = "/api/v1/";
+var user = null;
+var defaultTimeout = 120000;
+
+//START FUNCTIONS
 
 function addZero(i) {
     if (i < 10) {
@@ -27,11 +31,17 @@ function connect() {
     stompClient.connect({}, function (frame) {
         setConnected(true);
         console.log('Connected: ' + frame);
+
+        //Get user
+        getUser(username);
+
+        //Subscribe to personal messages
         stompClient.subscribe('/queue/'+username, function (message) {
                 console.log(message);
                 showMessage(JSON.parse(message.body));
         });
 
+        //Subscribe to system alerts
         stompClient.subscribe('/topic/all', function (message) {
             console.log(message);
             showMessage(JSON.parse(message.body));
@@ -65,6 +75,11 @@ function sendMessage() {
             message.to = 'all';
             //Send text message
             stompClient.send("/app/messageAll", {}, JSON.stringify(message));
+            break;
+        case "textGroup":
+            //case: text
+            //Send text message
+            stompClient.send("/app/groupMessage", {}, JSON.stringify(message));
             break;
         default:
             //case: text
@@ -112,9 +127,48 @@ function showMessage(message) {
     $("#messages").append(msgTemplate);
 }
 
+function getUser(username){
+    $.ajax({
+        url: apiURL+"/users/byUsername/"+username,
+        type: "GET",
+        contentType: 'application/json; charset=utf-8',
+        success: function(resultData) {
+            user = resultData;
+            console.log(user);
+            subscribeToGroups();
+        },
+        error : function(jqXHR, textStatus, errorThrown) {
+            console.log(errorThrown);
+        },
+        timeout: defaultTimeout,
+    });
+}
+
+function subscribeToGroups() {
+    if (user == null) {
+        return;
+    }
+
+    user.groups.forEach(function (group) {
+        //Subscribe to personal messages
+        stompClient.subscribe('/topic/' + group.name, function (message) {
+            console.log(message);
+            showMessage(JSON.parse(message.body));
+        });
+    });
+
+    user.ownedGroups.forEach(function (group) {
+        //Subscribe to personal messages
+        stompClient.subscribe('/topic/' + group.name, function (message) {
+            console.log(message);
+            showMessage(JSON.parse(message.body));
+        });
+    });
+}
+
 function getOldMessages(){
     $.ajax({
-        url: apiURL,
+        url: apiURL+"/messages/",
         type: "GET",
         contentType: 'application/json; charset=utf-8',
         success: function(resultData) {
@@ -129,7 +183,42 @@ function getOldMessages(){
         error : function(jqXHR, textStatus, errorThrown) {
             console.log(errorThrown);
         },
-        timeout: 120000,
+        timeout: defaultTimeout,
+    });
+}
+
+function createGroup(){
+
+    let group =     {
+        id: 17,
+        name: "test1",
+        owner: {
+            id: 1,
+            username: "francisco",
+            password: "admin1",
+            role: "admin",
+            groups: [],
+            ownedGroups: [
+                17
+            ]
+        },
+        url: "/groups/test11291253989",
+        messages: [],
+        members: []
+    }
+
+    $.ajax({
+        url: apiURL+"/groups/create",
+        type: "POST",
+        contentType: 'application/json; charset=utf-8',
+        data: group,
+        success: function(resultData) {
+            console.log(resultData);
+        },
+        error : function(jqXHR, textStatus, errorThrown) {
+            console.log(errorThrown);
+        },
+        timeout: defaultTimeout,
     });
 }
 
@@ -159,6 +248,13 @@ $(function () {
             case "textAll":
                 $("#textFormField").show();
                 $("#textRecipientField").hide();
+                $("#fileFormField").hide();
+
+                modal.find('.modal-body textarea').val('');
+                break;
+            case "textGroup":
+                $("#textFormField").show();
+                $("#textRecipientField").show();
                 $("#fileFormField").hide();
 
                 modal.find('.modal-body textarea').val('');
