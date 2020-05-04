@@ -44,3 +44,16 @@ dependencies {
 test {
 	useJUnitPlatform()
 }
+
+//task bootRunTest(type: org.springframework.boot.gradle.run.BootRunTask, dependsOn: 'build') {
+//	group = 'Application'
+//	doFirst() {
+//		main = project.mainClassName
+//		classpath = sourceSets.main.runtimeClasspath
+//		systemProperty 'spring.profiles.active', 'test'
+//	}
+//}
+
+//task stage() {
+//	dependsOn clean, war
+//}
