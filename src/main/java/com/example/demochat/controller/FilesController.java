@@ -9,7 +9,6 @@ import java.nio.file.StandardCopyOption;
 
 import com.example.demochat.model.Message;
 import com.example.demochat.service.MessageService;
-import jdk.internal.loader.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.UrlResource;
