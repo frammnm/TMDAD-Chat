@@ -24,7 +24,6 @@ public class Message implements Serializable {
   @Column(name = "timestamp")
   private String timestamp;
 
-
   @ManyToOne
   @JoinColumn(name="group_id")
   private Group group;
@@ -56,20 +55,20 @@ public class Message implements Serializable {
     this.body = body;
   }
 
-  public String getFrom() {
+  public String getSent_from() {
     return sent_from;
   }
 
-  public void setFrom(String from) {
-    this.sent_from = from;
+  public void setSent_from(String sent_from) {
+    this.sent_from = sent_from;
   }
 
-  public String getTo() {
+  public String getSent_to() {
     return sent_to;
   }
 
-  public void setTo(String to) {
-    this.sent_to = to;
+  public void setSent_to(String sent_to) {
+    this.sent_to = sent_to;
   }
 
   public String getTimestamp() {
@@ -87,4 +86,5 @@ public class Message implements Serializable {
   public void setGroup(Group group) {
     this.group = group;
   }
+
 }

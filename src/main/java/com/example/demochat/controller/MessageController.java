@@ -35,6 +35,11 @@ public class MessageController {
         messageService.sendGroupMessage(m);
     }
 
+    @PostMapping("/groupMessage")
+    public Message sendGroupMessageHTTP(Message m) {
+        return messageService.sendGroupMessageHTTP(m);
+    }
+
     @MessageMapping("/messageAll")
     public void broadcastMessage(Message m) {
         messageService.broadcastMessage(m);

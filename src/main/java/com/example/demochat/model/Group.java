@@ -27,8 +27,7 @@ public class Group implements Serializable {
     @Column(name = "url", unique = true)
     private String url;
 
-    @Column(name = "messages")
-    @OneToMany(mappedBy = "group")
+    @OneToMany(mappedBy = "group", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Message> messages;
 
     @ManyToMany(mappedBy = "groups", cascade = CascadeType.ALL)

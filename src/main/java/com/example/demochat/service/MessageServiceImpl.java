@@ -41,7 +41,7 @@ public class MessageServiceImpl implements MessageService {
 
         Map<String,Object> map = new HashMap<>();
         map.put(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON);
-        op.convertAndSend("/queue/" + m.getTo(), m, map);
+        op.convertAndSend("/queue/" + m.getSent_to(), m, map);
 
         //save in db
         messages.save(m);
@@ -60,22 +60,66 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public Message sendMessageHTTP(Message m) {
-        return messages.save(new Message(m.getBody(), m.getFrom(), m.getTo(), m.getTimestamp()));
+        return messages.save(new Message(m.getBody(), m.getSent_from(), m.getSent_to(), m.getTimestamp()));
 //        return m;
     }
 
     public void sendGroupMessage(Message m) {
         //send message using the broker
-        Map<String,Object> map = new HashMap<>();
-        map.put(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON);
-        op.convertAndSend("/topic/"+m.getTo(), m, map);
+//        Map<String,Object> map = new HashMap<>();
+//        map.put(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON);
+//        op.convertAndSend("/topic/"+m.getSent_to(), m, map);
 
         //save in db
-        //Group group = groups.findByName(m.getTo());
-        //List<Message> groupMessages = group.getMessages();
-        //groupMessages.add(m);
-        //m.setGroup(group);
-        //groups.save(group);
-        //messages.save(m);
+//        System.out.println(m);
+//        System.out.println(m.getId());
+//        System.out.println(m.getBody());
+//        System.out.println(m.getSent_from());
+//        System.out.println(m.getSent_to());
+//        System.out.println(m.getTimestamp());
+
+
+        Message savedMessage = messages.save(m);
+        Group group = groups.findByName(m.getSent_to());
+
+        List<Message> groupMessages = group.getMessages();
+        groupMessages.add(savedMessage);
+        group.setMessages(groupMessages);
+        savedMessage.setGroup(group);
+        messages.save(savedMessage);
+
+    }
+
+    public Message sendGroupMessageHTTP(Message m) {
+//        System.out.println(m);
+//        System.out.println(m.getId());
+//        System.out.println(m.getBody());
+//        System.out.println(m.getSent_from());
+//        System.out.println(m.getSent_to());
+//        System.out.println(m.getTimestamp());
+        //save in db
+//        Message savedMessage = messages.save(m);
+//        System.out.println("msgId:");
+//        System.out.println(m.getId());
+//
+//        System.out.println("to:");
+//        System.out.println(m.getSent_to());
+//        Group group = groups.findByName(m.getSent_to());
+//        System.out.println("grpId:");
+//        System.out.println(group.getId());
+//
+//        List<Message> groupMessages = group.getMessages();
+//
+//        System.out.println("list:");
+//        System.out.println(groupMessages);
+//
+//
+//        groupMessages.add(m);
+//        group.setMessages(groupMessages);
+//        m.setGroup(group);
+//        groups.save(group);
+//        messages.save(savedMessage);
+        return messages.save(m);
+
     }
 }

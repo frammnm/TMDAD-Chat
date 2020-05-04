@@ -10,4 +10,5 @@ public interface MessageService {
     public abstract void broadcastMessage(Message m);
     public abstract Message sendMessageHTTP(Message m);
     public abstract void sendGroupMessage(Message m);
+    public abstract Message sendGroupMessageHTTP(Message m);
 }
