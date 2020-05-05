@@ -66,9 +66,9 @@ public class MessageServiceImpl implements MessageService {
 
     public void sendGroupMessage(Message m) {
         //send message using the broker
-//        Map<String,Object> map = new HashMap<>();
-//        map.put(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON);
-//        op.convertAndSend("/topic/"+m.getSent_to(), m, map);
+        Map<String,Object> map = new HashMap<>();
+        map.put(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON);
+        op.convertAndSend("/topic/"+m.getSent_to(), m, map);
 
         //save in db
 //        System.out.println(m);
