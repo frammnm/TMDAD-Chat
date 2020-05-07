@@ -1,6 +1,7 @@
 package com.example.demochat.model;
 
 import javax.persistence.*;
+import com.fasterxml.jackson.annotation.JsonView;
 import java.io.Serializable;
 import java.util.List;
 
@@ -10,22 +11,28 @@ public class Message implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @JsonView(AppViews.Public.class)
   private long id;
 
   @Column(name = "body")
+  @JsonView(AppViews.Public.class)
   private String body;
 
   @Column(name = "sent_from")
+  @JsonView(AppViews.Public.class)
   private String sent_from;
 
   @Column(name = "sent_to")
+  @JsonView(AppViews.Public.class)
   private String sent_to;
 
   @Column(name = "timestamp")
+  @JsonView(AppViews.Public.class)
   private String timestamp;
 
   @ManyToOne
   @JoinColumn(name="group_id")
+  @JsonView(AppViews.Internal.class)
   private Group group;
 
   public Message() {

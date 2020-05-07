@@ -6,6 +6,7 @@ import com.example.demochat.model.*;
 import com.example.demochat.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import com.fasterxml.jackson.annotation.*;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
@@ -28,11 +29,13 @@ public class GroupController {
     private SimpMessageSendingOperations op;
 
     @GetMapping("/")
+    @JsonView(AppViews.Public.class)
     public List<Group> getAllGroups() {
         return groups.findAll();
     }
 
     @PostMapping("/create")
+    @JsonView(AppViews.Public.class)
     public Group createGroup(@RequestBody Group u) {
         System.out.println("####################################");
         System.out.println(u.getName());
@@ -43,16 +46,19 @@ public class GroupController {
     }
 
     @GetMapping("/{id}")
+    @JsonView(AppViews.Public.class)
     public Group getGroup(@PathVariable long id) {
         return groups.findById(id).orElse(null);
     }
 
     @PutMapping("/{id}")
+    @JsonView(AppViews.Public.class)
     public Group updateGroup(@RequestBody Group g) {
         return groups.save(g);
     }
 
     @GetMapping("/{id}/messages")
+    @JsonView(AppViews.Public.class)
     public List<Message> getGroupMessages(@PathVariable long id) {
         Group group = groups.findById(id).orElse(null);
 
@@ -64,6 +70,7 @@ public class GroupController {
     }
 
     @PutMapping("/addMember")
+    @JsonView(AppViews.Public.class)
     public Group addMemberToGroup(@RequestBody Map<String, Long> reqObject) {
         Group currentGroup = groups.findById(reqObject.get("group_id")).orElse(null);
         User user = users.findById(reqObject.get("member_id")).orElse(null);

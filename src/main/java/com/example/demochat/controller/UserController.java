@@ -6,6 +6,7 @@ import com.example.demochat.model.*;
 import com.example.demochat.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import com.fasterxml.jackson.annotation.*;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
@@ -25,6 +26,7 @@ public class UserController {
     private SimpMessageSendingOperations op;
 
     @GetMapping("/")
+    @JsonView(AppViews.Public.class)
     public List<User> getAllUsers() {
         return users.findAll();
     }
@@ -41,16 +43,19 @@ public class UserController {
 //    }
 
     @GetMapping("/{id}")
+    @JsonView(AppViews.Public.class)
     public User getUser(@PathVariable long id) {
         return users.findById(id).orElse(null);
     }
 
     @GetMapping("/byUsername/{username}")
+    @JsonView(AppViews.Public.class)
     public User getUser(@PathVariable String username) {
         return users.findByUsername(username);
     }
 
     @PutMapping("/{id}")
+    @JsonView(AppViews.Public.class)
     public User updateUser(@RequestBody User u) {
         return users.save(u);
     }

@@ -10,27 +10,32 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "groups")
-@JsonIdentityInfo( generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Group implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonView(AppViews.Public.class)
     private long id;
 
     @Column(name = "name",  unique = true)
+    @JsonView(AppViews.Public.class)
     private String name;
 
     @ManyToOne
     @JoinColumn(name="owner")
+    @JsonView(AppViews.Internal.class)
     private User owner;
 
     @Column(name = "url", unique = true)
+    @JsonView(AppViews.Public.class)
     private String url;
 
     @OneToMany(mappedBy = "group", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JsonView(AppViews.Internal.class)
     private List<Message> messages;
 
     @ManyToMany(mappedBy = "groups", cascade = CascadeType.ALL)
+    @JsonView(AppViews.Internal.class)
     private List<User> members;
 
     public Group(String name, User owner) {

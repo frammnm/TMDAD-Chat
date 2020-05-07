@@ -7,21 +7,25 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "users", uniqueConstraints={@UniqueConstraint(columnNames={"username"})})
-@JsonIdentityInfo( generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class User implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonView(AppViews.Public.class)
     private long id;
 
     @Column(name = "username")
+    @JsonView(AppViews.Public.class)
     private String username;
 
+
     @Column(name = "password")
+    @JsonView(AppViews.Public.class)
     private String password;
 
 
     @Column(name = "enabled")
+    @JsonView(AppViews.Public.class)
     private boolean enabled;
 
 
@@ -32,10 +36,12 @@ public class User implements Serializable {
     @JoinTable( name = "user_groups",
                 joinColumns = @JoinColumn(name = "user_id"),
                 inverseJoinColumns = @JoinColumn(name = "group_id"))
+    @JsonView(AppViews.Public.class)
     private List<Group> groups;
 
 
     @OneToMany(targetEntity = Group.class, mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonView(AppViews.Public.class)
     private List<Group> ownedGroups;
 
 //    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
