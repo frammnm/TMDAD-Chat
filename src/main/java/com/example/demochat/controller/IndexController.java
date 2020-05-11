@@ -9,4 +9,9 @@ public class IndexController {
     public String greeting() {
         return "index";
     }
+
+    @RequestMapping("/old")
+    public String greeting_old() {
+        return "index_old";
+    }
 }

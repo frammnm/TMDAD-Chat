@@ -4,15 +4,17 @@
     <title>Hello WebSocket</title>
     <!-- Resources on other origins must be CORS-enabled. -->
     <link href="../webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link src="../webjars/font-awesome/5.12.0/css/all.css">
     <link href="./main.css" rel="stylesheet" >
 </head>
 <body>
 <noscript>
     <h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
-    enabled. Please enable Javascript and reload this page!</h2>
+        enabled. Please enable Javascript and reload this page!</h2>
 </noscript>
+
 <div id="main-content" class="container">
-    <nav class="navbar navbar-dark bg-dark navbar-expand-sm sticky-top">
+    <nav class="navbar navbar-dark navbar-expand-sm">
         <form class="mx-2 my-auto d-inline w-100" id="conexion" action="conexion" method="get">
             <div class="input-group">
                 <input class="form-control" type="text" id="username" name="username" placeholder="Your username here..."/>
@@ -25,80 +27,87 @@
         </form>
     </nav>
     <br>
-    <div class="row">
-        <div class="col-sm-2">
-            <button class="btn btn-secondary" type="button" data-toggle="modal" data-target="#sendMessageModal" data-sending="text">Enviar Mensaje</button>
-        </div>
-        <div class="col-sm-2">
-            <button class="btn btn-secondary" type="button" data-toggle="modal" data-target="#sendMessageModal" data-sending="file">Enviar Archivo</button>
-        </div>
-        <div class="col-sm-3">
-            <button class="btn btn-secondary" type="button" data-toggle="modal" data-target="#sendMessageModal" data-sending="textGroup">Enviar Mensaje a un grupo</button>
-        </div>
-        <div class="col-sm-3">
-            <button class="btn btn-secondary" type="button" data-toggle="modal" data-target="#sendMessageModal" data-sending="textAll">Enviar Mensaje a Todos</button>
-        </div>
-    </div>
-    <br>
-    <div class="row">
-        <div class="col-md-12">
-            <table id="conversation" class="table table-striped table-dark">
-                <thead>
-                <tr>
-                    <th style="width:5%">Tipo</th>
-                    <th style="width:5%">Hora</th>
-                    <th style="width:15%">Emisor</th>
-                    <th style="width:15%">Receptor</th>
-                    <th style="width:60%">Mensaje</th>
-                </tr>
-                </thead>
-                <tbody id="messages">
-                </tbody>
-            </table>
+    <!-- <h3 class=" text-center">Welcome Roberto</h3> -->
+    <div id="messaging-app" class="view-container row">
+        <div class="inbox-container row">
+            <div class="col-md-4 inbox-people">
+                <div class="row heading-search">
+                    <!--
+                    <div class="col-md-3">
+                        <h4 class="srch-bar-heading">Recent</h4>
+                    </div>
+                    -->
+                    <div class="col-md-10 srch-bar">
+                        <input type="text" class="search-bar"  placeholder="Search" >
+                        <span class="input-group-addon">
+                            <button type="button" class="srch-addon-button"> <i class="fa fa-search" aria-hidden="true"></i> </button>
+                        </span>
+                    </div>
+                    <div class="col-md-2" style="text-align: center">
+                        <button type="button" class="srch-addon-button"> <i class="fa fa-plus" aria-hidden="true"></i> </button>
+                    </div>
+                </div>
+                <div class="row inbox-list">
+
+<!--                    <div class="row chat-list-item active-chat">
+                        <div class="col-md-2 chat-type"><i class="fas fa-users"></i></div>
+                        <div class="col-md-10 chat-preview">
+                            <h5>Grupito que tal <span class="chat-preview-date">Dec 25</span></h5>
+                            <p>Test, which is a new approach to have all solutions
+                                astrology under one roof.</p>
+                        </div>
+                    </div>
+
+                    <div class="row chat-list-item">
+                        <div class="col-md-2 chat-type"><i class="fas fa-user"></i></div>
+                        <div class="col-md-10 chat-preview">
+                            <h5>Juan Abud <span class="chat-preview-date">Dec 25</span></h5>
+                            <p>Test, which is a new approach to have all solutions
+                                astrology under one roof.</p>
+                        </div>
+                    </div>-->
+
+                </div>
+            </div>
+            <div class="col-md-8 messages-container">
+                <div class="height-container">
+                    <div class="row message-history">
+                        <!--<div class="col-md-12 incoming-message">
+                            <div class="received-message">
+                                <div class="message-wrapper">
+                                    <p>Test which is a new approach to have all
+                                        solutions</p>
+                                    <span class="message-time-date"> 11:01 AM    |    June 9</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 outgoing-message">
+                            <div class="sent-message">
+                                <div class="message-wrapper">
+                                    <p>Test which is a new approach to have all
+                                        solutions</p>
+                                    <span class="message-time-date"> 11:01 AM    |    June 9</span>
+                                </div>
+                            </div>
+                        </div>-->
+                    </div>
+                </div>
+                <div class="row type-message-container">
+                    <div class="col-md-10 input-message-write">
+                        <input id="message-text" type="text" class="write-msg" placeholder="Type a message" />
+                    </div>
+                    <div class="col-md-1">
+                        <button id="send-file" class="message-attach-btn" type="button"><i class="fas fa-paperclip"></i></button>
+                    </div>
+                    <div class="col-md-1">
+                        <button id="send-message" class="message-send-btn" type="button"><i class="far fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-
-<!-- Modal de enviar mensaje -->
-<div class="modal fade" id="sendMessageModal" tabindex="-1" role="dialog" aria-labelledby="sendMessageModal" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="nuevoMensaje">Nuevo mensaje</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="form-group" id="textRecipientField">
-                        <label for="recipient-name" class="col-form-label">Receptor:</label>
-                        <input type="text" class="form-control" id="recipient-name">
-                    </div>
-                    <div class="form-group" id="groupRecipientField">
-                        <label for="groupRecipientField">Grupo:</label>
-                        <select class="form-control" id="recipient-group">
-                            <option value="none">Elige un grupo</option>
-                        </select>
-                    </div>
-                    <div class="form-group" id="textFormField">
-                        <label for="message-text" class="col-form-label">Mensaje:</label>
-                        <textarea class="form-control" id="message-text" maxlength="500"></textarea>
-                    </div>
-                    <div class="form-group" id="fileFormField">
-                        <label for="uploadFile">Subir Archivo</label>
-                        <input type="file" class="form-control-file" id="uploadFile">
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-dark" id="send">Enviar</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <script src="../webjars/jquery/jquery.min.js"></script>
 <script src="../webjars/sockjs-client/sockjs.min.js"></script>

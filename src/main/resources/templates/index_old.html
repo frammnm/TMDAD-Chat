@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Hello WebSocket</title>
+    <!-- Resources on other origins must be CORS-enabled. -->
+    <link href="../webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="./main_old.css" rel="stylesheet" >
+</head>
+<body>
+<noscript>
+    <h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
+    enabled. Please enable Javascript and reload this page!</h2>
+</noscript>
+<div id="main-content" class="container">
+    <nav class="navbar navbar-dark bg-dark navbar-expand-sm sticky-top">
+        <form class="mx-2 my-auto d-inline w-100" id="conexion" action="conexion" method="get">
+            <div class="input-group">
+                <input class="form-control" type="text" id="username" name="username" placeholder="Your username here..."/>
+                <span class="input-group-append">
+                    <button id="connect" class="btn btn-secondary" type="submit">Connect</button>
+                    <button id="disconnect" class="btn btn-secondary" type="submit" disabled="disabled">Disconnect
+                    </button>
+                </span>
+            </div>
+        </form>
+    </nav>
+    <br>
+    <div class="row">
+        <div class="col-sm-2">
+            <button class="btn btn-secondary" type="button" data-toggle="modal" data-target="#sendMessageModal" data-sending="text">Enviar Mensaje</button>
+        </div>
+        <div class="col-sm-2">
+            <button class="btn btn-secondary" type="button" data-toggle="modal" data-target="#sendMessageModal" data-sending="file">Enviar Archivo</button>
+        </div>
+        <div class="col-sm-3">
+            <button class="btn btn-secondary" type="button" data-toggle="modal" data-target="#sendMessageModal" data-sending="textGroup">Enviar Mensaje a un grupo</button>
+        </div>
+        <div class="col-sm-3">
+            <button class="btn btn-secondary" type="button" data-toggle="modal" data-target="#sendMessageModal" data-sending="textAll">Enviar Mensaje a Todos</button>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-md-12">
+            <table id="conversation" class="table table-striped table-dark">
+                <thead>
+                <tr>
+                    <th style="width:5%">Tipo</th>
+                    <th style="width:5%">Hora</th>
+                    <th style="width:15%">Emisor</th>
+                    <th style="width:15%">Receptor</th>
+                    <th style="width:60%">Mensaje</th>
+                </tr>
+                </thead>
+                <tbody id="messages">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal de enviar mensaje -->
+<div class="modal fade" id="sendMessageModal" tabindex="-1" role="dialog" aria-labelledby="sendMessageModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="nuevoMensaje">Nuevo mensaje</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group" id="textRecipientField">
+                        <label for="recipient-name" class="col-form-label">Receptor:</label>
+                        <input type="text" class="form-control" id="recipient-name">
+                    </div>
+                    <div class="form-group" id="groupRecipientField">
+                        <label for="groupRecipientField">Grupo:</label>
+                        <select class="form-control" id="recipient-group">
+                            <option value="none">Elige un grupo</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="textFormField">
+                        <label for="message-text" class="col-form-label">Mensaje:</label>
+                        <textarea class="form-control" id="message-text" maxlength="500"></textarea>
+                    </div>
+                    <div class="form-group" id="fileFormField">
+                        <label for="uploadFile">Subir Archivo</label>
+                        <input type="file" class="form-control-file" id="uploadFile">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-dark" id="send">Enviar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="../webjars/jquery/jquery.min.js"></script>
+<script src="../webjars/sockjs-client/sockjs.min.js"></script>
+<script src="../webjars/stomp-websocket/stomp.min.js"></script>
+<script src="../webjars/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="../webjars/font-awesome/5.12.0/js/all.js"></script>
+<script src="/app_old.js"></script>
+</body>
+</html>

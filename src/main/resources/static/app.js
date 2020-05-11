@@ -1,10 +1,34 @@
-var stompClient = null;
-var apiURL = "/api/v1/";
-var user = null;
-var defaultTimeout = 120000;
+const defaultTimeout = 120000;
+const apiURL = "/api/v1/";
+const messageType = ['Notice', 'Direct', 'Group'];
+const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-//START FUNCTIONS
+let stompClient = null;
+let user = null;
+let groups = null;
+let conversations = [];
 
+/*
+let message = {
+    sent_from: "",
+    body: "",
+    sent_to: "",
+    timestamp: 1589229776178,
+    type: messageType[1],
+    received: false
+}
+
+let conversation = {
+    receiver: {
+        id: 0,
+        name: "",
+        url: ""
+    },
+    messages: []
+}
+ */
+
+//Util functions
 function addZero(i) {
     if (i < 10) {
         i = "0" + i;
@@ -12,16 +36,44 @@ function addZero(i) {
     return i;
 }
 
+function truncateString(str, num) {
+    if (str.length <= num) {
+        return str
+    }
+    return str.slice(0, num) + '...'
+}
+
+function getFormattedDateAndTime(date) {
+    var hours = date.getHours();
+    var minutes = date.getMinutes();
+    var month = months[date.getMonth()];
+    var day = date.getDate();
+
+    return hours+':'+minutes+' | '+month+' '+day;
+}
+
+//Connection Functions
 function setConnected(connected) {
     $("#connect").prop("disabled", connected);
     $("#disconnect").prop("disabled", !connected);
     if (connected) {
-        $("#conversation").show();
+        $("#messaging-app").show();
     }
     else {
-        $("#conversation").hide();
+        $("#messaging-app").hide();
     }
-    $("#messages").html("");
+
+    //Empty users and conversations
+    $(".inbox-list").html('');
+    $(".message-history").html('');
+}
+
+function disconnect() {
+    if (stompClient !== null) {
+        stompClient.disconnect();
+    }
+    setConnected(false);
+    console.log("Disconnected");
 }
 
 function connect() {
@@ -35,33 +87,73 @@ function connect() {
         //Get user
         getUser(username);
 
-        //Subscribe to personal messages
-        stompClient.subscribe('/queue/'+username, function (m) {
-                console.log(m);
-                let message = JSON.parse(m.body);
-                message.type = 'Directo';
-                showMessage(message);
-        });
-
         //Subscribe to system alerts
         stompClient.subscribe('/topic/all', function (m) {
-            console.log(m);
+            //console.log(m);
             let message = JSON.parse(m.body);
-            message.type = 'Aviso';
-            showMessage(message);
+            message.type = messageType[0];
+            message.received = true;
+            handleMessage(message);
+        });
+
+        //Subscribe to personal messages
+        stompClient.subscribe('/queue/'+username, function (m) {
+            //console.log(m);
+            let message = JSON.parse(m.body);
+            message.type = messageType[1];
+            message.received = true;
+            handleMessage(message);
         });
     });
 }
 
-function disconnect() {
-    if (stompClient !== null) {
-        stompClient.disconnect();
+function handleGroups(){
+    if (user == null){
+        return;
     }
-    setConnected(false);
-    console.log("Disconnected");
+
+    let belongGroups = user.groups;
+    let ownedGroups = user.ownedGroups;
+    groups = belongGroups.concat(ownedGroups);
+    console.log(groups);
+
+    //Create Message
+    let message = createMessage();
+    message.type = messageType[2];
+    message.received = false;
+
+    //Fill dropdown
+    //let dropdown = $("#recipient-group");
+    groups.forEach(function (group) {
+        let newConv = createConversation(group.name);
+        conversations.unshift(newConv);
+        //const clonedMessage = Object.assign({}, message);
+        message.sent_to = group.name;
+        let template = getConversationTemplate(message);
+        $(".inbox-list").prepend(template);
+    //    dropdown.append($("<option />").val(group.name).text(group.name));
+    });
+
+    //TODO: Ask for groups' old messages and append
+
+    subscribeToGroups(groups);
 }
 
-function sendMessage() {
+function subscribeToGroups(groups) {
+    //Subscribe to Group messages
+    groups.forEach(function (group) {
+        stompClient.subscribe('/topic/' + group.name, function (m) {
+            console.log(m);
+            let message = JSON.parse(m.body);
+            message.type = messageType[2];
+            message.received = true;
+            handleMessage(message);
+        });
+    });
+}
+
+//Message functionalities
+function sendMessage(isFile = false) {
     let sendType = $('#sendMessageModal').data("sending-type");
 
     let message = {
@@ -95,6 +187,144 @@ function sendMessage() {
     }
 }
 
+function handleMessage(message) {
+    let convIndex = -1;
+    let convName = message.sent_from;
+
+    if (message.type == messageType[2]){
+        convName = message.sent_to;
+    }
+
+    conversations.forEach(function (conv, index) {
+        if (conv.receiver.name == convName){
+            convIndex = index;
+        }
+    });
+
+    let template = getConversationTemplate(message);
+
+    if (convIndex != -1){
+        $(".inbox-list > .chat-list-item").eq(convIndex).replaceWith(template);
+        conversations[convIndex].messages.push(message);
+    }else{
+        $(".inbox-list").prepend(template);
+        let newConv = createConversation(message.sent_from);
+        newConv.messages.push(message);
+        conversations.unshift(newConv);
+    }
+    updateUIWithMessage(message);
+}
+
+function createConversation(name='noname') {
+    let conversation = {
+        receiver: {
+            id: 0,
+            name: name,
+            url: ""
+        },
+        messages: []
+    }
+
+    return conversation;
+}
+
+function createMessage(from='', to='', body='') {
+    let message = {
+        sent_from: from,
+        body: body,
+        sent_to: to,
+        timestamp: new Date().getTime()
+    }
+
+    return message;
+}
+
+function getConversationTemplate(message){
+    let date = new Date(parseInt(message.timestamp));
+    let parsedDate = getFormattedDateAndTime(date).split(' | ');
+    let typeIcon = 'fa-user';
+    let convName = message.sent_from;
+
+    if (message.type == messageType[2]){
+        convName = message.sent_to;
+        typeIcon = 'fa-users';
+    }
+
+    let convTemplate = [
+        '<div class="row chat-list-item">',
+            '<div class="col-md-2 chat-type"><i class="fas '+typeIcon+'"></i></div>',
+            '<div class="col-md-10 chat-preview">',
+                '<h5>'+convName+'<span class="chat-preview-date">| '+parsedDate[1]+'</span></h5>',
+                '<p>'+truncateString(message.body, 40)+'</p>',
+            '</div>',
+        '</div>'
+    ];
+    return convTemplate.join('');
+}
+
+function getMessageTemplate(message){
+    let date = new Date(parseInt(message.timestamp));
+    let parsedDate = getFormattedDateAndTime(date);
+    let colWrapper = 'outgoing-message';
+    let innerWrapper = 'sent-message';
+
+    if (message.received){
+        colWrapper = 'incoming-message';
+        innerWrapper = 'received-message';
+    }
+
+    //Check if is a file message and change body to link
+
+    let msgTemplate = [
+        '<div class="col-md-12 '+colWrapper+'">',
+            '<div class="'+innerWrapper+'">',
+                '<div class="message-wrapper">',
+                    '<p>'+message.body+'</p>',
+                    '<span class="message-time-date">'+parsedDate+'</span>',
+                '</div>',
+            '</div>',
+        '</div>'
+    ];
+    return msgTemplate.join('');
+}
+
+function updateUIWithMessage(message){
+    let activeName = getConvName();
+    if (message.sent_from == activeName || message.sent_to == activeName){
+        $('.message-history').append(getMessageTemplate(message));
+    }
+}
+
+function refreshMessages(){
+    let activeName = getConvName();
+    for (let conv of conversations) {
+        if (conv.receiver.name == activeName) {
+            $('.message-history').html('');
+            conv.messages.forEach(function (message) {
+                $('.message-history').append(getMessageTemplate(message));
+            })
+            break;
+        }
+    }
+}
+
+function getUser(username){
+    $.ajax({
+        url: apiURL+"/users/byUsername/"+username,
+        type: "GET",
+        contentType: 'application/json; charset=utf-8',
+        success: function(resultData) {
+            user = resultData;
+            console.log(user);
+            handleGroups();
+        },
+        error : function(jqXHR, textStatus, errorThrown) {
+            console.log(errorThrown);
+        },
+        timeout: defaultTimeout,
+    });
+}
+
 function uploadFile(message) {
     let formData = new FormData();
     formData.append('message',
@@ -124,87 +354,8 @@ function uploadFile(message) {
     });
 }
 
-function showMessage(message) {
-    let msgTemplate = "<tr>";
-    let date = new Date(parseInt(message.timestamp));
-    msgTemplate += "<td>"+ message.type +"</td>";
-    msgTemplate += "<td>"+ date.getHours() + ":" + addZero(date.getMinutes()) +"</td>";
-    msgTemplate += "<td>"+ message.sent_from +"</td>";
-    msgTemplate += "<td>"+ message.sent_to +"</td>";
-    msgTemplate += "<td>"+ message.body +"</td>";
-    msgTemplate += "</tr>";
-    $("#messages").append(msgTemplate);
-}
-
-function getUser(username){
-    $.ajax({
-        url: apiURL+"/users/byUsername/"+username,
-        type: "GET",
-        contentType: 'application/json; charset=utf-8',
-        success: function(resultData) {
-            user = resultData;
-            console.log(user);
-            handleGroups();
-        },
-        error : function(jqXHR, textStatus, errorThrown) {
-            console.log(errorThrown);
-        },
-        timeout: defaultTimeout,
-    });
-}
-
-function handleGroups(){
-    if (user == null){
-        return;
-    }
-
-    let belongGroups = user.groups;
-    let ownedGroups = user.ownedGroups;
-    let groups = belongGroups.concat(ownedGroups);
-    console.log(groups);
-
-    //Fill dropdown
-    let dropdown = $("#recipient-group");
-    groups.forEach(function (group) {
-        dropdown.append($("<option />").val(group.name).text(group.name));
-    });
-
-    subscribeToGroups(groups);
-}
-
-function subscribeToGroups(groups) {
-    //Subscribe to Group messages
-    groups.forEach(function (group) {
-        stompClient.subscribe('/topic/' + group.name, function (m) {
-            console.log(m);
-            let message = JSON.parse(m.body);
-            message.type = 'Grupo';
-            showMessage(message);
-        });
-    });
-}
-
-function getOldMessages(){
-    $.ajax({
-        url: apiURL+"/messages/",
-        type: "GET",
-        contentType: 'application/json; charset=utf-8',
-        success: function(resultData) {
-            //console.log(resultData);
-            let username = $("#username").val();
-            resultData.forEach(function(message) {
-                if (message.sent_to == username){
-                    message.sent_to = 'Yo';
-                    message.type = 'Directo'
-                    showMessage(message);
-                }
-            });
-        },
-        error : function(jqXHR, textStatus, errorThrown) {
-            console.log(errorThrown);
-        },
-        timeout: defaultTimeout,
-    });
+function getConvName(jQueryConv = $('.active-chat')){
+    return jQueryConv.find('h5').text().split('|')[0];
 }
 
 $(function () {
@@ -215,7 +366,20 @@ $(function () {
     });
     $( "#connect" ).click(function() { connect();});
     $( "#disconnect" ).click(function() { disconnect(); });
-    $( "#send" ).click(function() { sendMessage(); $('#sendMessageModal').modal('hide')});
+    $('body').on('click', '#send-file', function() { sendMessage(true);});
+    $('body').on('click', '#send-message', function() { sendMessage(false);});
+
+    $('body').on('click', '.inbox-list > div.chat-list-item', function() {
+        let conv = $(this);
+        let convName = getConvName(conv);
+        let activeName = getConvName();
+
+        if (convName != activeName){
+            $('.active-chat').removeClass('active-chat');
+            conv.addClass('active-chat');
+            refreshMessages();
+        }
+    });
 
     $('#sendMessageModal').on('show.bs.modal', function (event) {
         let button = $(event.relatedTarget); // Button that triggered the modal
@@ -255,8 +419,5 @@ $(function () {
 
                 modal.find('.modal-body textarea').val('');
         }
-
-        // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-        // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
     })
 });
