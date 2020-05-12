@@ -44,27 +44,12 @@ public class User implements Serializable {
     @JsonView(AppViews.Public.class)
     private List<Group> ownedGroups;
 
-//    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-//    @JoinTable(name = "user_authority",
-//            joinColumns = { @JoinColumn(name = "user_id") },
-//            inverseJoinColumns = { @JoinColumn(name = "authority_id") })
-//    private Set<Authority> authorities = new HashSet<>();
-
 
     public User(String username, String password) {
         this.username = username;
         this.password = password;
         this.role = "common";
     }
-
-
-//    public Set<Authority> getAuthorities() {
-//        return authorities;
-//    }
-//
-//    public void setAuthorities(Set<Authority> authorities) {
-//        this.authorities = authorities;
-//    }
 
 
     public boolean isEnabled() {
