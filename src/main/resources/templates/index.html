@@ -97,7 +97,10 @@
                         <input id="message-text" type="text" class="write-msg" placeholder="Type a message" />
                     </div>
                     <div class="col-md-1">
-                        <button id="send-file" class="message-attach-btn" type="button"><i class="fas fa-paperclip"></i></button>
+                        <label for="file-input" class="message-attach-btn">
+                            <i class="attach-file fa fa-paperclip" aria-hidden="true"></i>
+                        </label>
+                        <input id="file-input" type="file"/>
                     </div>
                     <div class="col-md-1">
                         <button id="send-message" class="message-send-btn" type="button"><i class="far fa-paper-plane"></i></button>

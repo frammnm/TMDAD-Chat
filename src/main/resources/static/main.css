@@ -149,9 +149,15 @@ input:focus {
 
 .message-time-date {
     color: #747474;
-    display: block;
     font-size: 12px;
     margin: 8px 0 0;
+}
+
+.group-message-username{
+    color: #747474;
+    font-size: 14px;
+    margin: 8px 0 0;
+    font-weight: 500;
 }
 
 .type-message-container {
@@ -179,4 +185,16 @@ input:focus {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
+}
+.message-attach-btn{
+    text-align: center;
+}
+#file-input
+{
+    display: none;
+}
+.attach-file
+{
+    vertical-align: bottom;
+    cursor: pointer;
 }
