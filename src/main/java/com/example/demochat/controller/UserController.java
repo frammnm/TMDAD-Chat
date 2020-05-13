@@ -13,7 +13,7 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.util.MimeTypeUtils;
 import java.util.HashMap;
 import java.util.Map;
-
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -25,6 +25,9 @@ public class UserController {
     @Autowired
     private SimpMessageSendingOperations op;
 
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
+
     @GetMapping("/")
     @JsonView(AppViews.Public.class)
     public List<User> getAllUsers() {
@@ -33,7 +36,9 @@ public class UserController {
 
     @PostMapping("/signup")
     public User createUser(@RequestBody User u) {
-        return users.save(new User(u.getUsername(), u.getPassword()));
+
+        String password = passwordEncoder.encode(u.getPassword());
+        return users.save(new User(u.getUsername(), password));
     }
 
 
