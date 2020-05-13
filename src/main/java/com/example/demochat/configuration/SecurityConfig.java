@@ -16,9 +16,14 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import javax.sql.DataSource;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import org.springframework.security.core.Authentication;
 
+import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
@@ -30,33 +35,43 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private MyUserDetailsService userDetailsService;
 
+
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-//        http
-//                .authorizeRequests()
-//                .antMatchers("/").permitAll()
-//                .antMatchers("/webjars/**").permitAll()
-//                .antMatchers("/app.js").permitAll()
-//                .antMatchers("/login").permitAll()
-//                .anyRequest().authenticated()
-//                .and()
-//                .formLogin()
-//                .loginPage("/login")
-//                .permitAll()
-//                .and()
-//                .logout()
-//                .permitAll();
-//        PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
-        http.authorizeRequests()
-                .anyRequest().authenticated()
-                .and().httpBasic();
+        http
+            .authorizeRequests(
+                    authorize -> authorize
+                                .anyRequest()
+                                .authenticated()
+            )
+            .formLogin()
+            .successHandler(successHandler()).and()
+            .httpBasic().and()
+            .logout()
+            .deleteCookies("JSESSIONID")
+            .invalidateHttpSession(true);
+
+    }
+
+    private AuthenticationSuccessHandler successHandler() {
+        return new AuthenticationSuccessHandler() {
+            @Override
+            public void onAuthenticationSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) throws IOException {
+//                httpServletResponse.getWriter().append("OK");
+//                httpServletResponse.setStatus(200);
+                System.out.println("Entre");
+                System.out.println(httpServletRequest);
+                System.out.println(httpServletResponse);
+                System.out.println(authentication.getPrincipal());
+                httpServletResponse.sendRedirect("/");
+            }
+        };
     }
 
     @Autowired
     public void configAuthentication(AuthenticationManagerBuilder auth) throws Exception {
-//        auth.userDetailsService(userDetailsService);
         auth.authenticationProvider(authProvider());
-//        authProvider.setPasswordEncoder(encoder());
     }
 
     @Bean

@@ -31,6 +31,7 @@ public class CustomUserDetails extends User implements UserDetails {
     public String getPassword() {
         return user.getPassword();
     }
+
     @Override
     public String getUsername() {
         if (this.user == null) {
