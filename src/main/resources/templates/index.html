@@ -38,18 +38,26 @@
                     </div>
                     -->
                     <div class="col-md-10 srch-bar">
-                        <input type="text" class="search-bar"  placeholder="Search" >
+                        <input type="text" class="search-bar" id="convSearchbar" placeholder="Search" >
                         <span class="input-group-addon">
-                            <button type="button" class="srch-addon-button"> <i class="fa fa-search" aria-hidden="true"></i> </button>
+                            <label class="srch-addon-button"> <i class="fa fa-search" aria-hidden="true"></i> </label>
                         </span>
                     </div>
-                    <div class="col-md-2" style="text-align: center">
-                        <button type="button" class="srch-addon-button"> <i class="fa fa-plus" aria-hidden="true"></i> </button>
+
+                    <div class="col-md-2 btn-group dropright" style="text-align: center">
+                        <button type="button" class="srch-addon-button dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="fa fa-plus" aria-hidden="true"></i> </button>
+                        <div class="dropdown-menu">
+                            <button class="dropdown-item" type="button" data-toggle="modal" data-target="#actionModal" data-sending="conv-new">Nueva Conversación</button>
+                            <button class="dropdown-item" type="button" data-toggle="modal" data-target="#actionModal" data-sending="group-new">Crear Grupo</button>
+                            <button class="dropdown-item" type="button" data-toggle="modal" data-target="#actionModal" data-sending="group-addPerson">Agregar a Grupo</button>
+                            <button class="dropdown-item" type="button" data-toggle="modal" data-target="#actionModal" data-sending="send-all">Enviar a Todos</button>
+                        </div>
                     </div>
+
                 </div>
                 <div class="row inbox-list">
-
-<!--                    <div class="row chat-list-item active-chat">
+                <!--
+                    <div class="row chat-list-item active-chat">
                         <div class="col-md-2 chat-type"><i class="fas fa-users"></i></div>
                         <div class="col-md-10 chat-preview">
                             <h5>Grupito que tal <span class="chat-preview-date">Dec 25</span></h5>
@@ -65,7 +73,8 @@
                             <p>Test, which is a new approach to have all solutions
                                 astrology under one roof.</p>
                         </div>
-                    </div>-->
+                    </div>
+                -->
 
                 </div>
             </div>
@@ -112,10 +121,66 @@
 </div>
 
 
+<!-- Modal de Crear conversacion -->
+<div class="modal fade" id="actionModal" tabindex="-1" role="dialog" aria-labelledby="actionModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Nuevo mensaje</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group" id="recipientField">
+                        <label for="recipient-name" class="col-form-label">Usuario:</label>
+                        <input type="text" class="form-control" id="recipient-name">
+                    </div>
+                    <div class="form-group" id="groupListField">
+                        <label for="groupListField">Grupo:</label>
+                        <select class="form-control" id="recipient-group">
+                            <option value="none">Elige un grupo</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="ownGroupListField">
+                        <label for="ownGroupListField">Grupo:</label>
+                        <select class="form-control" id="owned-groups">
+                            <option value="none">Elige un grupo</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="textMessageField">
+                        <label for="message-text" class="col-form-label">Mensaje:</label>
+                        <textarea class="form-control" id="message-all" maxlength="500"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-dark" id="modalAccept">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Alertas de sistema -->
+<div class="alert-message" id="systemAlert">
+    <div class="alert alert-info alert-dismissible fade show inner-alert-message">
+        <h4 class="alert-heading">Alerta</h4>
+        <hr>
+        <span><p class="mb-0">Alerta de sistema</p></span>
+        <button type="button" class="close" data-hide="systemAlert">&times;</button>
+    </div>
+</div>
+
+
+
 <script src="../webjars/jquery/jquery.min.js"></script>
 <script src="../webjars/sockjs-client/sockjs.min.js"></script>
 <script src="../webjars/stomp-websocket/stomp.min.js"></script>
-<script src="../webjars/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="../webjars/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
 <script src="../webjars/font-awesome/5.12.0/js/all.js"></script>
 <script src="/app.js"></script>
 </body>
