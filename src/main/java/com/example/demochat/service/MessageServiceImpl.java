@@ -41,7 +41,9 @@ public class MessageServiceImpl implements MessageService {
 
         Map<String,Object> map = new HashMap<>();
         map.put(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON);
-        op.convertAndSend("/queue/" + m.getSent_to(), m, map);
+        String sendPath = "queue";
+        //Check if its group, change queue for topic
+        op.convertAndSend("/" + sendPath + "/" + m.getSent_to(), m, map);
 
         //save in db
         messages.save(m);

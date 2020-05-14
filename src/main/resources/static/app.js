@@ -1,5 +1,5 @@
 const defaultTimeout = 120000;
-const apiURL = "/api/v1/";
+const apiURL = "/api/v1";
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const messageType = {
     Notice: 'Notice',
@@ -32,6 +32,33 @@ let conversation = {
     messages: []
 }
  */
+
+//Class Functions
+function getConvName(jQueryConv = $('.active-chat')){
+    return jQueryConv.find('h5').text().split('|')[0];
+}
+
+function getConvIndex(convName=''){
+    let convIndex = -1;
+    conversations.forEach(function (conv, index) {
+        if (conv.receiver.name == convName){
+            convIndex = index;
+        }
+    });
+    return convIndex;
+}
+
+function getOwnedGroupIndex(groupName=''){
+    let groupIndex = -1;
+    if (!user) return groupIndex;
+
+    user.ownedGroups.forEach(function (group, index) {
+        if (group.name == groupName){
+            groupIndex = index;
+        }
+    });
+    return groupIndex;
+}
 
 //Util functions
 function addZero(i) {
@@ -70,9 +97,13 @@ function setConnected(connected) {
         user = null;
         groups = null;
         conversations = [];
+
+        $('#recipient-group').find('option').not(':first').remove();
+        $('#owned-groups').find('option').not(':first').remove();
     }
 
     //Empty users and conversations
+    finishProcess();
     $(".inbox-list").html('');
     $(".message-history").html('');
 }
@@ -86,15 +117,16 @@ function disconnect() {
 }
 
 function connect() {
-    let socket = new SockJS('/stomp');
     let username = $("#username").val();
+    if (!username) return;
+
+    let socket = new SockJS('/stomp');
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function (frame) {
         setConnected(true);
         console.log('Connected: ' + frame);
-
         //Get user
-        getUser(username);
+        getUserAPI(username);
 
         //Subscribe to system alerts
         stompClient.subscribe('/topic/all', function (m) {
@@ -124,27 +156,11 @@ function handleGroups(){
     let belongGroups = user.groups;
     let ownedGroups = user.ownedGroups;
     groups = belongGroups.concat(ownedGroups);
-    //console.log(groups);
-
-    //Create Message
-    let message = createMessage();
-    message.type = messageType.Group;
-    message.received = false;
-
-    //Fill dropdown
-    //let dropdown = $("#recipient-group");
     groups.forEach(function (group) {
-        let newConv = createConversation(group.name, message.type);
-        conversations.unshift(newConv);
-        //const clonedMessage = Object.assign({}, message);
-        message.sent_to = group.name;
-        let template = getConversationTemplate(message);
-        $(".inbox-list").prepend(template);
-    //    dropdown.append($("<option />").val(group.name).text(group.name));
+        handleNewGroup(group);
     });
 
     //TODO: Ask for groups' old messages and append
-
     subscribeToGroups(groups);
 }
 
@@ -166,6 +182,7 @@ function subscribeToGroups(groups) {
 
 function startProcess(){
     //Disable buttons
+    $('#modalAccept').prop('disabled', true);
     $('#send-message').prop('disabled', true);
     $('#file-input').prop('disabled', true);
 }
@@ -173,28 +190,40 @@ function startProcess(){
 function finishProcess(){
     //Enable buttons and clean message box
     $("#message-text").val('');
+    $('#recipient-name').val('');
+    $('#recipient-group').val('none').change();
+    $('#owned-groups').val('none').change();
     $('#file-input').val(null);
 
+
+    $('#modalAccept').prop('disabled', false);
     $('#send-message').prop('disabled', false);
     $('#file-input').prop('disabled', false);
 }
 
 //Message functionalities
 function sendMessage(all = false) {
+    //Get message body
+    let msgBody = $("#message-text").val();
+    if (!msgBody){
+        //Empty string, do nothing
+        return;
+    }
+
     //Disable buttons
     startProcess();
 
-    let message = {
-        sent_from: user.username,
-        body: $("#message-text").val(),
-        sent_to: getConvName(),
-        timestamp: Date.now()
-    }
+    let message = createMessage(user.username, getConvName(), msgBody);
+    //Remove because backend doesnt support these fields
+    delete message.type;
+    delete message.received;
 
     if (all){
+        message.body = $('#message-all').val();
         message.sent_to = 'all';
         //Send text message
         stompClient.send("/app/messageAll", {}, JSON.stringify(message));
+        finishProcess();
         return;
     }
 
@@ -208,7 +237,7 @@ function sendMessage(all = false) {
     });
 
     if ($('#file-input').get(0).files.length > 0) {
-        uploadFile(message, convIndex);
+        uploadFileAPI(message, convIndex);
         return;
     }
 
@@ -236,6 +265,13 @@ function sendMessage(all = false) {
 function handleMessage(message) {
     let convIndex = -1;
     let convName = message.sent_from;
+
+    if (message.type == messageType.Notice){
+        $('#systemAlert .alert-heading').text(message.sent_from);
+        $('#systemAlert p').text(message.body);
+        $('#systemAlert').fadeIn();
+        return;
+    }
 
     if (message.type == messageType.Group){
         convName = message.sent_to;
@@ -276,11 +312,13 @@ function createConversation(name='noname', type = messageType.Direct) {
     return conversation;
 }
 
-function createMessage(from='', to='', body='') {
+function createMessage(from='', to='', body='', type= messageType.Direct, received=false) {
     let message = {
         sent_from: from,
         body: body,
         sent_to: to,
+        type: type,
+        received: received,
         timestamp: new Date().getTime()
     }
 
@@ -374,7 +412,23 @@ function refreshMessages(){
     }
 }
 
-function getUser(username){
+function handleNewGroup(group, active=false){
+    //Create Message
+    let message = createMessage('', group.name, '', messageType.Group);
+    let newConv = createConversation(group.name, message.type);
+    conversations.unshift(newConv);
+    let template = getConversationTemplate(message, active);
+    $(".inbox-list").prepend(template);
+    $("#recipient-group").append($("<option />").val(group.name).text(group.name));
+    //If is owned, add to dropdown
+    if (getOwnedGroupIndex(group.name) >= 0 ){
+        $("#owned-groups").append($("<option />").val(group.name).text(group.name));
+    }
+}
+
+function getUserAPI(username){
+    if (!username) return;
+
     $.ajax({
         url: apiURL+"/users/byUsername/"+username,
         type: "GET",
@@ -391,7 +445,7 @@ function getUser(username){
     });
 }
 
-function uploadFile(message, convIndex=-1) {
+function uploadFileAPI(message, convIndex=-1) {
     let formData = new FormData();
     formData.append('message',
         new Blob([JSON.stringify(message)],
@@ -429,12 +483,85 @@ function uploadFile(message, convIndex=-1) {
     });
 }
 
-function getConvName(jQueryConv = $('.active-chat')){
-    return jQueryConv.find('h5').text().split('|')[0];
+function createGroupAPI(groupName = ''){
+    startProcess();
+    //Create Message
+    let group = {
+        name: groupName,
+        owner: user
+    }
+
+    $.ajax({
+        url: apiURL+'/groups/create',
+        data: JSON.stringify(group),
+        type: 'POST',
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(res) {
+            console.log(res);
+            user.ownedGroups.push(res);
+            $('.active-chat').removeClass('active-chat');
+            handleNewGroup(group);
+            refreshMessages();
+            subscribeToGroups([group]);
+            finishProcess();
+        },
+        error: function(err) {
+            console.log(err.responseJSON);
+            finishProcess();
+        }
+    });
+}
+
+function handleModalAccept(){
+    let actionType = $('#actionModal').data("action-type");
+    let convName = $('#recipient-name').val();
+    let convIndex = -1;
+
+    switch(actionType) {
+        case 'group-new':
+            if (!convName) return;
+
+            convIndex = getConvIndex(convName);
+            if (convIndex == -1) {
+                createGroupAPI(convName);
+            }
+            break;
+        case 'group-addPerson':
+            //Validate field not empty, and group is selected
+            let group = $('#owned-groups').val();
+            if (!convName || group == 'none') return;
+
+            alert('añadir persona');
+            break;
+        case "send-all":
+            sendMessage(true);
+            break;
+        default:
+            //case: conv-new
+            if (!convName) return;
+
+            convIndex = getConvIndex(convName);
+            if (convIndex == -1){
+                //Create Conversation
+                let message = createMessage(user.username, convName);
+                let newConv = createConversation(convName, message.type);
+                conversations.unshift(newConv);
+                let template = getConversationTemplate(message, true);
+                $('.active-chat').removeClass('active-chat');
+                $(".inbox-list").prepend(template);
+                refreshMessages();
+                finishProcess();
+            }
+    }
 }
 
 $(function () {
     setConnected(false);
+    //This is to be able to hide alerts
+    $("[data-hide]").on("click", function(){
+        $("#" + $(this).attr("data-hide")).hide();
+    });
 
     $("form").on('submit', function (e) {
         e.preventDefault();
@@ -443,6 +570,15 @@ $(function () {
     $( "#disconnect" ).click(function() { disconnect(); });
     $('body').on('click', '#send-message', function() { sendMessage();});
 
+    //Filter conversations on searchbar keyup
+    $('body').on("keyup", '#convSearchbar', function() {
+        var value = $(this).val().toLowerCase();
+        $(".inbox-list > div").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    });
+
+    //Change active conversation
     $('body').on('click', '.inbox-list > div.chat-list-item', function() {
         let conv = $(this);
         let convName = getConvName(conv);
@@ -454,4 +590,54 @@ $(function () {
             refreshMessages();
         }
     });
+
+    //Handle action modal
+    $('#actionModal').on('show.bs.modal', function (event) {
+        let button = $(event.relatedTarget); // Button that triggered the modal
+        let sendType = button.data('sending');
+        let modal = $(this);
+
+        modal.data("action-type", sendType);
+
+        switch(sendType) {
+            case "group-new":
+                $("#modalTitle").text('Nuevo Grupo');
+                $("#recipientField > label").text('Nombre del grupo:');
+                $("#recipientField").show();
+                $("#textMessageField").hide();
+                $("#groupListField").hide();
+                $("#ownGroupListField").hide();
+                break;
+            case "group-addPerson":
+                $("#modalTitle").text('Añadir persona a un grupo');
+                $("#recipientField > label").text('Usuario:');
+                $("#recipientField").show();
+                $("#textMessageField").hide();
+                $("#groupListField").hide();
+                $("#ownGroupListField").show();
+
+                modal.find('#textRecipientField').val('');
+                break;
+            case "send-all":
+                $("#modalTitle").text('Nuevo Mensaje de Sistema');
+                $("#recipientField").hide();
+                $("#textMessageField").show();
+                $("#groupListField").hide();
+                $("#ownGroupListField").hide();
+
+                modal.find('.modal-body textarea').val('');
+                break;
+            default:
+                //case: conv-new
+                $("#modalTitle").text('Nueva Conversación');
+                $("#recipientField > label").text('Usuario:');
+                $("#recipientField").show();
+                $("#textMessageField").hide();
+                $("#groupListField").hide();
+                $("#ownGroupListField").hide();
+
+                modal.find('#textRecipientField').val('');
+        }
+    });
+    $( "#modalAccept" ).click(function() { handleModalAccept(); $('#actionModal').modal('hide');});
 });

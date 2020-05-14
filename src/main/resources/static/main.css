@@ -24,7 +24,6 @@ input:focus {
 
 .heading-search {
     padding: 10px 0;
-    overflow: hidden;
     border-bottom: 1px solid #c4c4c4;
 }
 
@@ -162,6 +161,9 @@ input:focus {
 
 .type-message-container {
     border-top: 1px solid #c4c4c4;
+    bottom: 0;
+    position: absolute;
+    width: 100%;
 }
 
 .input-message-write input {
@@ -197,4 +199,17 @@ input:focus {
 {
     vertical-align: bottom;
     cursor: pointer;
+}
+.alert-message {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 5px;
+    z-index: 9999;
+    display: none;
+}
+.inner-alert-message {
+    margin: 0 auto;
+    width: 80%;
 }
