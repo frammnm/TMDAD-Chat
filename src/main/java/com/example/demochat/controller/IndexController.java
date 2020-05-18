@@ -10,8 +10,13 @@ public class IndexController {
         return "index";
     }
 
-    @RequestMapping("/old")
-    public String greeting_old() {
-        return "index_old";
+    @RequestMapping("/login2")
+    public String login() {
+        return "login";
+    }
+
+    @RequestMapping("/register")
+    public String register() {
+        return "register";
     }
 }
