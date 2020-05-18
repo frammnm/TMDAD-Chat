@@ -10,6 +10,10 @@ sourceCompatibility = '1.8'
 
 repositories {
 	mavenCentral()
+	jcenter()
+	maven {
+		url 'http://oss.jfrog.org/artifactory/oss-snapshot-local/'
+	}
 }
 
 ext {
@@ -19,6 +23,7 @@ ext {
 	sockjsClientVersion = '1.0.2'
 	jQueryVersion = '3.1.1-1'
 	jwtToken = '0.9.1'
+	swaggerVersion = '2.9.2'
 }
 
 dependencies {
@@ -36,6 +41,11 @@ dependencies {
 	implementation("org.webjars:bootstrap:${boostrapVersion}")
 	implementation("org.webjars:font-awesome:${fontawesomeVersion}")
 	implementation("org.webjars:jquery:${jQueryVersion}")
+
+	//Swagger dependencies
+	implementation("io.springfox:springfox-swagger2:${swaggerVersion}")
+	implementation("io.springfox:springfox-swagger-ui:${swaggerVersion}")
+
 	runtimeOnly 'org.postgresql:postgresql'
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
