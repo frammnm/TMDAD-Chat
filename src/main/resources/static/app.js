@@ -205,7 +205,8 @@ function finishProcess(){
 function sendMessage(all = false) {
     //Get message body
     let msgBody = $("#message-text").val();
-    if (!msgBody){
+
+    if (!all && !msgBody){
         //Empty string, do nothing
         return;
     }

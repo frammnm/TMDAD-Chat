@@ -1,3 +1,5 @@
+const apiURL = "/api/v1";
+
 function validate() {
     return ($('#username').val() && $('#password').val())
 }
@@ -24,7 +26,9 @@ function login(){
         contentType: 'application/json',
         success: function(res) {
             console.log(res);
-            sessionStorage.setItem('sesionJTW', res);
+            sessionStorage.setItem('session-token', res.jwt);
+            sessionStorage.setItem('session-user', JSON.stringify(res.user));
+            location.href='/'
         },
         error: function(err) {
             console.log(err.responseJSON);
@@ -41,4 +45,9 @@ $(function () {
         e.preventDefault();
     });
     $('body').on('click', '#send-button', function() { login();});
+
+    //This is to be able to hide alerts
+    $("[data-hide]").on("click", function(){
+        $("#" + $(this).attr("data-hide")).hide();
+    });
 })
