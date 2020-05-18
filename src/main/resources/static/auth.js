@@ -17,12 +17,13 @@ function login(){
     }
 
     $.ajax({
-        url: apiURL+'/users/signup',
+        url: apiURL+'/users/signin',
         data: JSON.stringify(user),
         type: 'POST',
         dataType: 'json',
         contentType: 'application/json',
         success: function(res) {
+            console.log(res);
             sessionStorage.setItem('sesionJTW', res);
         },
         error: function(err) {
