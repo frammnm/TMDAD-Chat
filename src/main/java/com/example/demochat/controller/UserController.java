@@ -14,6 +14,14 @@ import org.springframework.util.MimeTypeUtils;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UserDetails;
+import com.example.demochat.service.MyUserDetailsService;
+import com.example.demochat.configuration.JwtTokenUtil;
+
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -27,6 +35,15 @@ public class UserController {
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private MyUserDetailsService userDetailsService;
+
+    @Autowired
+    private JwtTokenUtil TokenUtil;
 
     @GetMapping("/")
     @JsonView(AppViews.Public.class)
@@ -42,10 +59,23 @@ public class UserController {
     }
 
 
-//    @PostMapping("/login")
-//    public User createUser(@RequestBody Login lg) {
-//        return users.findById(lg.getUsername(), lg.getPassword());
-//    }
+    @PostMapping("/signin")
+    public ResponseEntity<?> authenticateUser(@RequestBody AuthenticationRequest auth) throws Exception {
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            auth.getUsername(),
+                            auth.getPassword()
+                    )
+            );
+        } catch (BadCredentialsException e) {
+            throw new Exception("Incorrect username or password", e);
+        }
+
+        final UserDetails userDetails = userDetailsService.loadUserByUsername(auth.getUsername());
+        final String token = TokenUtil.generateToken(userDetails);
+        return ResponseEntity.ok(new AuthenticationResponse(token));
+    }
 
     @GetMapping("/{id}")
     @JsonView(AppViews.Public.class)
