@@ -43,10 +43,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final String[] AUTH_WHITELIST = {
             "/api/v1/users/signin",
+            "/api/v1/users/signup",
             "/login",
+            "/register",
 
             // Project resources
-            "/**", //Validar todo pq no sirve
+//            "/**", //Validar todo pq no sirve
 
             // -- swagger ui
             "/swagger-resources/**",

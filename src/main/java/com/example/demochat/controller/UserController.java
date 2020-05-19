@@ -60,6 +60,7 @@ public class UserController {
 
 
     @PostMapping("/signin")
+    @JsonView(AppViews.Public.class)
     public ResponseEntity<?> authenticateUser(@RequestBody AuthenticationRequest auth) throws Exception {
         try {
             authenticationManager.authenticate(
@@ -72,9 +73,10 @@ public class UserController {
             throw new Exception("Incorrect username or password", e);
         }
 
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(auth.getUsername());
+        final CustomUserDetails userDetails = userDetailsService.loadUserByUsername(auth.getUsername());
         final String token = TokenUtil.generateToken(userDetails);
-        return ResponseEntity.ok(new AuthenticationResponse(token));
+        final User user = userDetails.getUser();
+        return ResponseEntity.ok(new AuthenticationResponse(token, user));
     }
 
     @GetMapping("/{id}")
