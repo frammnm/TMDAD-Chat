@@ -32,6 +32,10 @@ public class CustomUserDetails extends User implements UserDetails {
         return user.getPassword();
     }
 
+    public String getRole() {
+        return this.user.getRole();
+    }
+
     @Override
     public String getUsername() {
         if (this.user == null) {
@@ -58,6 +62,10 @@ public class CustomUserDetails extends User implements UserDetails {
         return true;
     }
 
+    @Override
+    public long getId() {
+        return this.user.getId();
+    }
 
     @Override
     public boolean isEnabled() {

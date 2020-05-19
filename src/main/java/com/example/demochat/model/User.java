@@ -20,7 +20,7 @@ public class User implements Serializable {
 
 
     @Column(name = "password")
-    @JsonView(AppViews.Public.class)
+    @JsonView(AppViews.Internal.class)
     private String password;
 
 
@@ -48,7 +48,8 @@ public class User implements Serializable {
     public User(String username, String password) {
         this.username = username;
         this.password = password;
-        this.role = "common";
+        this.role = "USER";
+        this.enabled = true;
     }
 
 

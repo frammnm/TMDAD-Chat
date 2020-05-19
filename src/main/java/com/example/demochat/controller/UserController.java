@@ -21,6 +21,8 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import com.example.demochat.service.MyUserDetailsService;
 import com.example.demochat.configuration.JwtTokenUtil;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PostAuthorize;
 
 
 @RestController
@@ -47,17 +49,17 @@ public class UserController {
 
     @GetMapping("/")
     @JsonView(AppViews.Public.class)
-    public List<User> getAllUsers() {
-        return users.findAll();
+    public ResponseEntity<List<User>> getAllUsers() {
+        return ResponseEntity.ok(users.findAll());
     }
 
     @PostMapping("/signup")
-    public User createUser(@RequestBody User u) {
-
+    @JsonView(AppViews.Public.class)
+    public ResponseEntity<User> createUser(@RequestBody User u) {
         String password = passwordEncoder.encode(u.getPassword());
-        return users.save(new User(u.getUsername(), password));
+        User user = users.save(new User(u.getUsername(), password));
+        return ResponseEntity.ok(user);
     }
-
 
     @PostMapping("/signin")
     @JsonView(AppViews.Public.class)
@@ -80,25 +82,62 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    @JsonView(AppViews.Public.class)
-    public User getUser(@PathVariable long id) {
-        return users.findById(id).orElse(null);
+    @JsonView(AppViews.Public.class) //getAuthorities
+    @PostAuthorize("#id == authentication.getPrincipal().getId() or authentication.getPrincipal().getRole() =='ADMIN'")
+    public ResponseEntity<User> getUser(@PathVariable long id) {
+
+        User user = users.findById(id).orElse(null);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(user);
     }
 
     @GetMapping("/byUsername/{username}")
     @JsonView(AppViews.Public.class)
-    public User getUser(@PathVariable String username) {
-        return users.findByUsername(username);
+    @PostAuthorize("#username == authentication.getPrincipal().getUsername() or authentication.getPrincipal().getRole() =='ADMIN'")
+    public ResponseEntity<User> getUserByUsername(@PathVariable String username) {
+        User user = users.findByUsername(username);
+        if (user == null) {
+            return ResponseEntity.notFound().build(); //.body("Username not found")
+        }
+
+        return ResponseEntity.ok(user);
     }
 
     @PutMapping("/{id}")
     @JsonView(AppViews.Public.class)
-    public User updateUser(@RequestBody User u) {
-        return users.save(u);
+    @PostAuthorize("#u.getId() == authentication.getPrincipal().getId() or authentication.getPrincipal().getRole() =='ADMIN'")
+    public ResponseEntity<User> updateUser(@RequestBody User u, @PathVariable long id) {
+
+        User oldUser = users.findById(id).orElse(null);
+        if (oldUser == null) {
+            return ResponseEntity.notFound().build(); //.body("Username not found")
+        }
+
+        String password = u.getPassword();
+        u.setPassword(passwordEncoder.encode(password));
+
+        try {
+            u.setRole(oldUser.getRole());
+            User user = users.save(u);
+            return ResponseEntity.ok(user);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build(); //"Wrong Object"
+        }
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable long id) {
+    @PostAuthorize("#id == authentication.getPrincipal().getId() or authentication.getPrincipal().getRole() =='ADMIN'")
+    public ResponseEntity<?> deleteUser(@PathVariable long id) {
+
+        User user = users.findById(id).orElse(null);
+        if (user == null) {
+            return ResponseEntity.notFound().build(); //.body("Username not found")
+        }
+
         users.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 }

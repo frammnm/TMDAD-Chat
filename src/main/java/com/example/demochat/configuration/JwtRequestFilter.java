@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import com.example.demochat.service.MyUserDetailsService;
 import com.example.demochat.configuration.JwtTokenUtil;
+import com.example.demochat.model.*;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
@@ -43,7 +44,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+            CustomUserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
             if (tokenUtil.validateToken(token, userDetails)) {
                 UsernamePasswordAuthenticationToken authByToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authByToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
