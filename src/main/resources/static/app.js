@@ -161,9 +161,11 @@ function handleGroups(){
     groups = belongGroups.concat(ownedGroups);
     groups.forEach(function (group) {
         handleNewGroup(group);
+        getGroupMessages(group);
     });
 
     //TODO: Ask for groups' old messages and append
+
     subscribeToGroups(groups);
 }
 
@@ -430,17 +432,24 @@ function handleNewGroup(group, active=false){
     }
 }
 
-function getUserAPI(username){
-    if (!username) return;
-
+function getGroupMessages(group){
     $.ajax({
-        url: apiURL+"/users/byUsername/"+username,
+        url: apiURL+"/groups/"+group.id+"/messages",
         type: "GET",
         contentType: 'application/json; charset=utf-8',
+        headers: { Authorization: 'Bearer ' + sessionStorage.getItem("session-token")},
         success: function(resultData) {
-            user = resultData;
-            console.log(user);
-            handleGroups();
+            console.log(resultData);
+            let messages = resultData;
+            messages.forEach(function (message) {
+                if (message.sent_from != user.username){
+                    message.received = true;
+                }else{
+                    message.received = false;
+                }
+                message.type = messageType.Group;
+                handleMessage(message);
+            })
         },
         error : function(jqXHR, textStatus, errorThrown) {
             console.log(errorThrown);
@@ -469,6 +478,7 @@ function uploadFileAPI(message, convIndex=-1) {
         //timeout: 600000,
         contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
         processData: false, // NEEDED, DON'T OMIT THIS
+        headers: { Authorization: 'Bearer ' + sessionStorage.getItem("session-token")},
         success: function(path) {
             finishProcess();
             let pathArray = path.split('/');
@@ -501,6 +511,7 @@ function createGroupAPI(groupName = ''){
         type: 'POST',
         dataType: 'json',
         contentType: 'application/json',
+        headers: { Authorization: 'Bearer ' + sessionStorage.getItem("session-token")},
         success: function(res) {
             console.log(res);
             user.ownedGroups.push(res);
