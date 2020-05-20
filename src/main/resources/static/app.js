@@ -98,7 +98,7 @@ function setConnected(connected) {
         groups = null;
         conversations = [];
 
-        $('#recipient-group').find('option').not(':first').remove();
+        $('#user-select').find('option').not(':first').remove();
         $('#owned-groups').find('option').not(':first').remove();
     }
 
@@ -161,10 +161,8 @@ function handleGroups(){
     groups = belongGroups.concat(ownedGroups);
     groups.forEach(function (group) {
         handleNewGroup(group);
-        getGroupMessages(group);
+        getGroupMessagesAPI(group);
     });
-
-    //TODO: Ask for groups' old messages and append
 
     subscribeToGroups(groups);
 }
@@ -195,8 +193,8 @@ function startProcess(){
 function finishProcess(){
     //Enable buttons and clean message box
     $("#message-text").val('');
-    $('#recipient-name').val('');
-    $('#recipient-group').val('none').change();
+    $('#group-name').val('');
+    $('#user-select').val('none').change();
     $('#owned-groups').val('none').change();
     $('#file-input').val(null);
 
@@ -416,6 +414,9 @@ function refreshMessages(){
             break;
         }
     }
+    //Scroll to bottom of list
+    let messageHistory = $('.message-history');
+    messageHistory.scrollTop(messageHistory.prop("scrollHeight") - messageHistory.height());
 }
 
 function handleNewGroup(group, active=false){
@@ -425,21 +426,20 @@ function handleNewGroup(group, active=false){
     conversations.unshift(newConv);
     let template = getConversationTemplate(message, active);
     $(".inbox-list").prepend(template);
-    $("#recipient-group").append($("<option />").val(group.name).text(group.name));
     //If is owned, add to dropdown
     if (getOwnedGroupIndex(group.name) >= 0 ){
-        $("#owned-groups").append($("<option />").val(group.name).text(group.name));
+        $("#owned-groups").append($("<option />").val(group.id).text(group.name));
     }
 }
 
-function getGroupMessages(group){
+function getGroupMessagesAPI(group){
     $.ajax({
         url: apiURL+"/groups/"+group.id+"/messages",
         type: "GET",
         contentType: 'application/json; charset=utf-8',
         headers: { Authorization: 'Bearer ' + sessionStorage.getItem("session-token")},
         success: function(resultData) {
-            console.log(resultData);
+            //console.log(resultData);
             let messages = resultData;
             messages.forEach(function (message) {
                 if (message.sent_from != user.username){
@@ -449,6 +449,50 @@ function getGroupMessages(group){
                 }
                 message.type = messageType.Group;
                 handleMessage(message);
+            })
+        },
+        error : function(jqXHR, textStatus, errorThrown) {
+            console.log(errorThrown);
+        },
+        timeout: defaultTimeout,
+    });
+}
+
+function addUserToGroupAPI(userId, groupId){
+    let sendObject = {
+        group_id: groupId,
+        member_id: userId
+    }
+    $.ajax({
+        url: apiURL+"/groups/addMember",
+        type: "PUT",
+        data: JSON.stringify(sendObject),
+        contentType: 'application/json; charset=utf-8',
+        headers: { Authorization: 'Bearer ' + sessionStorage.getItem("session-token")},
+        success: function(resultData) {
+            console.log(resultData);
+            finishProcess();
+        },
+        error : function(jqXHR, textStatus, errorThrown) {
+            console.log(errorThrown);
+        },
+        timeout: defaultTimeout,
+    });
+}
+
+function getUsersAPI(){
+    $.ajax({
+        url: apiURL+"/users/",
+        type: "GET",
+        contentType: 'application/json; charset=utf-8',
+        headers: { Authorization: 'Bearer ' + sessionStorage.getItem("session-token")},
+        success: function(resultData) {
+            console.log(resultData);
+            let users = resultData;
+            users.forEach(function (usr) {
+                if (user.id != usr.id) {
+                    $("#user-select").append($("<option />").val(usr.id).text(usr.username));
+                }
             })
         },
         error : function(jqXHR, textStatus, errorThrown) {
@@ -530,11 +574,11 @@ function createGroupAPI(groupName = ''){
 
 function handleModalAccept(){
     let actionType = $('#actionModal').data("action-type");
-    let convName = $('#recipient-name').val();
     let convIndex = -1;
 
     switch(actionType) {
         case 'group-new':
+            let convName = $('#group-name').val();
             if (!convName) return;
 
             convIndex = getConvIndex(convName);
@@ -544,23 +588,25 @@ function handleModalAccept(){
             break;
         case 'group-addPerson':
             //Validate field not empty, and group is selected
-            let group = $('#owned-groups').val();
-            if (!convName || group == 'none') return;
+            let groupId = $('#owned-groups').val();
+            let userId = $('#user-select').val();
+            if (groupId == 'none' || userId == 'none') return;
 
-            alert('añadir persona');
+            addUserToGroupAPI(userId, groupId)
             break;
         case "send-all":
             sendMessage(true);
             break;
         default:
             //case: conv-new
-            if (!convName) return;
+            if ($("#user-select").val() == 'none') return;
 
-            convIndex = getConvIndex(convName);
+            let newConvName = $("#user-select option:selected").text();
+            convIndex = getConvIndex(newConvName);
             if (convIndex == -1){
                 //Create Conversation
-                let message = createMessage(user.username, convName);
-                let newConv = createConversation(convName, message.type);
+                let message = createMessage(user.username, newConvName);
+                let newConv = createConversation(newConvName, message.type);
                 conversations.unshift(newConv);
                 let template = getConversationTemplate(message, true);
                 $('.active-chat').removeClass('active-chat');
@@ -578,6 +624,7 @@ function initApp(){
     console.log(user);
     if (user){
         connect();
+        getUsersAPI();
     }
 }
 
@@ -628,27 +675,25 @@ $(function () {
         switch(sendType) {
             case "group-new":
                 $("#modalTitle").text('Nuevo Grupo');
-                $("#recipientField > label").text('Nombre del grupo:');
-                $("#recipientField").show();
+                $("#newGroupField").show();
                 $("#textMessageField").hide();
-                $("#groupListField").hide();
+                $("#userListField").hide();
                 $("#ownGroupListField").hide();
+
+                modal.find('#group-name').val('');
                 break;
             case "group-addPerson":
                 $("#modalTitle").text('Añadir persona a un grupo');
-                $("#recipientField > label").text('Usuario:');
-                $("#recipientField").show();
+                $("#newGroupField").hide();
                 $("#textMessageField").hide();
-                $("#groupListField").hide();
+                $("#userListField").show();
                 $("#ownGroupListField").show();
-
-                modal.find('#textRecipientField').val('');
                 break;
             case "send-all":
                 $("#modalTitle").text('Nuevo Mensaje de Sistema');
-                $("#recipientField").hide();
+                $("#newGroupField").hide();
                 $("#textMessageField").show();
-                $("#groupListField").hide();
+                $("#userListField").hide();
                 $("#ownGroupListField").hide();
 
                 modal.find('.modal-body textarea').val('');
@@ -656,13 +701,10 @@ $(function () {
             default:
                 //case: conv-new
                 $("#modalTitle").text('Nueva Conversación');
-                $("#recipientField > label").text('Usuario:');
-                $("#recipientField").show();
+                $("#newGroupField").hide();
                 $("#textMessageField").hide();
-                $("#groupListField").hide();
+                $("#userListField").show();
                 $("#ownGroupListField").hide();
-
-                modal.find('#textRecipientField').val('');
         }
     });
     $( "#modalAccept" ).click(function() { handleModalAccept(); $('#actionModal').modal('hide');});
