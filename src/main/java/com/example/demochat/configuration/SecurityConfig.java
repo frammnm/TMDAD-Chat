@@ -48,7 +48,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/register",
 
             // Project resources
-//            "/**", //Validar todo pq no sirve
+            "/css/**",
+            "/js/**",
+            "/favicon.ico",
+            "/appLogo.png",
 
             // -- swagger ui
             "/swagger-resources/**",
