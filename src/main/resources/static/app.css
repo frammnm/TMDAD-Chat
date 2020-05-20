@@ -1,13 +1,25 @@
-input:focus {
+body {
+    font-family: "Poppins", sans-serif;
+    height: 100vh;
+    background-color: #337abe;
+}
+
+input:focus, button:focus {
     outline:none;
+}
+
+.dropdown-item:active {
+    background-color: #337abe;
 }
 
 .container {
     margin: auto;
+    height: 100%;
 }
 
 .view-container {
-    padding: 0 0 50px 0;
+    padding: 50px 0;
+    height: 100%;
 }
 
 .inbox-container {
@@ -15,6 +27,8 @@ input:focus {
     clear: both;
     overflow: hidden;
     width: 100%;
+    background: white;
+    box-shadow: 10px 10px 20px 0px;
 }
 
 .inbox-people {
@@ -131,7 +145,7 @@ input:focus {
 }
 
 .sent-message p {
-    background: #05728f none repeat scroll 0 0;
+    background: #337abe none repeat scroll 0 0;
     color: #ffffff;
 }
 
@@ -144,6 +158,7 @@ input:focus {
 
 .received-message .message-wrapper {
     max-width: 60%;
+    float: left;
 }
 
 .message-time-date {
@@ -176,7 +191,7 @@ input:focus {
 }
 
 .message-send-btn, .message-attach-btn {
-    background: #05728f none repeat scroll 0 0;
+    background: #337abe none repeat scroll 0 0;
     border: medium none;
     border-radius: 50%;
     color: #fff;
@@ -188,28 +203,32 @@ input:focus {
     top: 50%;
     transform: translateY(-50%);
 }
+
 .message-attach-btn{
     text-align: center;
 }
+
 #file-input
 {
     display: none;
 }
+
 .attach-file
 {
     vertical-align: bottom;
     cursor: pointer;
 }
+
 .alert-message {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    padding: 5px;
+    padding-top: 20px;
     z-index: 9999;
     display: none;
 }
 .inner-alert-message {
     margin: 0 auto;
-    width: 80%;
+    width: 85%;
 }

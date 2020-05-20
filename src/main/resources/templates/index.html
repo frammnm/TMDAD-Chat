@@ -14,6 +14,7 @@
 </noscript>
 
 <div id="main-content" class="container">
+    <!--
     <nav class="navbar navbar-dark navbar-expand-sm">
         <form class="mx-2 my-auto d-inline w-100" id="conexion" action="conexion" method="get">
             <div class="input-group">
@@ -27,7 +28,8 @@
         </form>
     </nav>
     <br>
-    <!-- <h3 class=" text-center">Welcome Roberto</h3> -->
+    -->
+    <!-- <h3 class=" text-center">Bienvenido: User</h3> -->
     <div id="messaging-app" class="view-container row">
         <div class="inbox-container row">
             <div class="col-md-4 inbox-people">
@@ -51,6 +53,7 @@
                             <button class="dropdown-item" type="button" data-toggle="modal" data-target="#actionModal" data-sending="group-new">Crear Grupo</button>
                             <button class="dropdown-item" type="button" data-toggle="modal" data-target="#actionModal" data-sending="group-addPerson">Agregar a Grupo</button>
                             <button class="dropdown-item" type="button" data-toggle="modal" data-target="#actionModal" data-sending="send-all">Enviar a Todos</button>
+                            <button class="dropdown-item" type="button" id="logout">Cerrar Sesión</button>
                         </div>
                     </div>
 
@@ -167,7 +170,7 @@
 
 <!-- Alertas de sistema -->
 <div class="alert-message" id="systemAlert">
-    <div class="alert alert-info alert-dismissible fade show inner-alert-message">
+    <div class="alert alert-primary alert-dismissible fade show inner-alert-message">
         <h4 class="alert-heading">Alerta</h4>
         <hr>
         <span><p class="mb-0">Alerta de sistema</p></span>

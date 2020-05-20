@@ -114,19 +114,22 @@ function disconnect() {
     }
     setConnected(false);
     console.log("Disconnected");
+    //Clear session
+    sessionStorage.clear();
+    location.href='/login'
 }
 
 function connect() {
-    let username = $("#username").val();
-    if (!username) return;
+    if (!user) return;
 
     let socket = new SockJS('/stomp');
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function (frame) {
         setConnected(true);
         console.log('Connected: ' + frame);
-        //Get user
-        getUserAPI(username);
+
+        //Subscribe to groups
+        handleGroups();
 
         //Subscribe to system alerts
         stompClient.subscribe('/topic/all', function (m) {
@@ -138,7 +141,7 @@ function connect() {
         });
 
         //Subscribe to personal messages
-        stompClient.subscribe('/queue/'+username, function (m) {
+        stompClient.subscribe('/queue/'+user.username, function (m) {
             //console.log(m);
             let message = JSON.parse(m.body);
             message.type = messageType.Direct;
@@ -149,7 +152,7 @@ function connect() {
 }
 
 function handleGroups(){
-    if (user == null){
+    if (!user){
         return;
     }
 
@@ -557,8 +560,20 @@ function handleModalAccept(){
     }
 }
 
-$(function () {
+function initApp(){
     setConnected(false);
+    //Get user
+    user = JSON.parse(sessionStorage.getItem('session-user'));
+    console.log(user);
+    if (user){
+        connect();
+    }
+}
+
+$(function () {
+    initApp();
+    $( "#logout" ).click(function() { disconnect(); });
+
     //This is to be able to hide alerts
     $("[data-hide]").on("click", function(){
         $("#" + $(this).attr("data-hide")).hide();
@@ -567,8 +582,7 @@ $(function () {
     $("form").on('submit', function (e) {
         e.preventDefault();
     });
-    $( "#connect" ).click(function() { connect();});
-    $( "#disconnect" ).click(function() { disconnect(); });
+
     $('body').on('click', '#send-message', function() { sendMessage();});
 
     //Filter conversations on searchbar keyup
