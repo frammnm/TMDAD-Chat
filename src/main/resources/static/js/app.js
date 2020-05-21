@@ -625,6 +625,8 @@ function initApp(){
     if (user){
         connect();
         getUsersAPI();
+    } else {
+        location.href = '/login'
     }
 }
 

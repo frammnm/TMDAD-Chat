@@ -42,16 +42,25 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private JwtRequestFilter jwtFiler;
 
     private static final String[] AUTH_WHITELIST = {
+
+
+            //Login & Register
             "/api/v1/users/signin",
             "/api/v1/users/signup",
             "/login",
             "/register",
+            "/home",
 
             // Project resources
             "/css/**",
             "/js/**",
             "/favicon.ico",
             "/appLogo.png",
+
+
+            //Stomp & Broker
+            "/stomp/**",
+
 
             // -- swagger ui
             "/swagger-resources/**",
@@ -65,10 +74,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable()
                 .authorizeRequests()
                 .antMatchers(AUTH_WHITELIST).permitAll()
-                .anyRequest().authenticated()
-                .and().sessionManagement()
+                .anyRequest().authenticated().and()
+                .formLogin().loginPage("/login").and()
+                .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
+//        loginPage("/login")
         http.addFilterBefore(jwtFiler, UsernamePasswordAuthenticationFilter.class);
 
     }

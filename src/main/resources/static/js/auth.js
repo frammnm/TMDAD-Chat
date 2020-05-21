@@ -28,7 +28,7 @@ function login(){
             console.log(res);
             sessionStorage.setItem('session-token', res.jwt);
             sessionStorage.setItem('session-user', JSON.stringify(res.user));
-            location.href='/'
+            location.href='/home'
         },
         error: function(err) {
             console.log(err.responseJSON);
