@@ -32,7 +32,7 @@ public class User implements Serializable {
     @Column(name = "role")
     private String role;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable( name = "user_groups",
                 joinColumns = @JoinColumn(name = "user_id"),
                 inverseJoinColumns = @JoinColumn(name = "group_id"))
@@ -40,7 +40,7 @@ public class User implements Serializable {
     private List<Group> groups;
 
 
-    @OneToMany(targetEntity = Group.class, mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(targetEntity = Group.class, mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonView(AppViews.Public.class)
     private List<Group> ownedGroups;
 
@@ -108,6 +108,27 @@ public class User implements Serializable {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public boolean isGroupOwner(long id) {
+        for (Group g : this.ownedGroups) {
+            if (g.getId() == id) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean isGroupMember(long id) {
+        for (Group g : this.groups) {
+            if (g.getId() == id) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 
     public User() {
         super();

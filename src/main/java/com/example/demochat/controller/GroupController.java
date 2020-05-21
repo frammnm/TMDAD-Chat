@@ -7,10 +7,11 @@ import com.example.demochat.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import com.fasterxml.jackson.annotation.*;
-import org.springframework.messaging.MessageHeaders;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.MimeTypeUtils;
+import com.example.demochat.service.GroupService;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,69 +27,81 @@ public class GroupController {
     private UserRepository users;
 
     @Autowired
-    private SimpMessageSendingOperations op;
+    private GroupService groupService;
 
     @GetMapping("/")
     @JsonView(AppViews.Public.class)
-    public List<Group> getAllGroups() {
-        return groups.findAll();
+    public  ResponseEntity<List<Group>> getAllGroups() {
+        return ResponseEntity.ok(groupService.getAllGroups());
     }
+
 
     @PostMapping("/create")
     @JsonView(AppViews.Public.class)
-    public Group createGroup(@RequestBody Group u) {
-        System.out.println("####################################");
-        System.out.println(u.getName());
-        System.out.println(u);
-        System.out.println("####################################");
-
-        return groups.save(new Group(u.getName(), u.getOwner()));
+    @PreAuthorize("#u.getOwner().getId() == authentication.getPrincipal().getId() or authentication.getPrincipal().getRole() =='ADMIN'")
+    public ResponseEntity<Group> createGroup(@RequestBody Group u) {
+        return ResponseEntity.ok(groupService.createGroup(u.getName(), u.getOwner()));
     }
 
     @GetMapping("/{id}")
     @JsonView(AppViews.Public.class)
-    public Group getGroup(@PathVariable long id) {
-        return groups.findById(id).orElse(null);
+    @PreAuthorize("authentication.getPrincipal().belongsToGroup(#id) or authentication.getPrincipal().getRole() =='ADMIN'")
+    public ResponseEntity<Group> getGroup(@PathVariable long id) {
+
+        Group group = groupService.getGroupById(id);
+
+        if (group == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(group);
     }
 
     @PutMapping("/{id}")
     @JsonView(AppViews.Public.class)
-    public Group updateGroup(@RequestBody Group g) {
-        return groups.save(g);
+    @PreAuthorize("#g.getOwner.getId() == authentication.getPrincipal().getId() or authentication.getPrincipal().getRole() =='ADMIN'")
+    public  ResponseEntity<Group> updateGroup(@RequestBody Group g) {
+
+        Group oldGroup = groupService.getGroupById(g.getId());
+        if (oldGroup == null) {
+            return ResponseEntity.notFound().build(); //.body("Username not found")
+        }
+
+        try {
+            Group group = groupService.updateGroup(g);
+            return ResponseEntity.ok(group);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build(); //"Wrong Object"
+        }
+
     }
 
     @GetMapping("/{id}/messages")
     @JsonView(AppViews.Public.class)
-    public List<Message> getGroupMessages(@PathVariable long id) {
-        Group group = groups.findById(id).orElse(null);
+    @PreAuthorize("authentication.getPrincipal().belongsToGroup(#id) or authentication.getPrincipal().getRole() =='ADMIN'")
+    public ResponseEntity<List<Message>> getGroupMessages(@PathVariable long id) {
+
+        Group group = groupService.getGroupById(id);
 
         if (group == null) {
-            return null;
+            return ResponseEntity.notFound().build();
         }
 
-        return group.getMessages();
+        return ResponseEntity.ok(group.getMessages());
     }
 
     @PutMapping("/addMember")
     @JsonView(AppViews.Public.class)
-    public Group addMemberToGroup(@RequestBody Map<String, Long> reqObject) {
-        Group currentGroup = groups.findById(reqObject.get("group_id")).orElse(null);
-        User user = users.findById(reqObject.get("member_id")).orElse(null);
+    @PreAuthorize("authentication.getPrincipal().isGroupOwner(#id) or authentication.getPrincipal().getRole() =='ADMIN'")
+    public ResponseEntity<Group> addMemberToGroup(@RequestBody AddMemberRequest req) {
 
-        if ((user == null) || (currentGroup == null)) {
-            return null;
-        } else {
-            List<User> currentMembers = currentGroup.getMembers();
-            currentMembers.add(user);
-            currentGroup.setMembers(currentMembers);
+        Group group = groupService.addMemberToGroup(req.getGroup_id(), req.getMember_id());
 
-            List<Group> userGroups = user.getGroups();
-            userGroups.add(currentGroup);
-            user.setGroups(userGroups);
-            users.save(user);
+        if (group == null) {
+            return ResponseEntity.notFound().build();
         }
 
-        return groups.save(currentGroup);
+        return ResponseEntity.ok(group);
     }
 
     @DeleteMapping("/{id}")

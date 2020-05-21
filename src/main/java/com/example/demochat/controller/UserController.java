@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import com.fasterxml.jackson.annotation.*;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
+//import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.util.MimeTypeUtils;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +31,7 @@ public class UserController {
 
     @Autowired
     private UserRepository users;
-
+    
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
@@ -80,7 +80,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     @JsonView(AppViews.Public.class) //getAuthorities
-    @PostAuthorize("#id == authentication.getPrincipal().getId() or authentication.getPrincipal().getRole() =='ADMIN'")
+    @PreAuthorize("#id == authentication.getPrincipal().getId() or authentication.getPrincipal().getRole() =='ADMIN'")
     public ResponseEntity<User> getUser(@PathVariable long id) {
 
         User user = users.findById(id).orElse(null);
@@ -93,7 +93,7 @@ public class UserController {
 
     @GetMapping("/byUsername/{username}")
     @JsonView(AppViews.Public.class)
-    @PostAuthorize("#username == authentication.getPrincipal().getUsername() or authentication.getPrincipal().getRole() =='ADMIN'")
+    @PreAuthorize("#username == authentication.getPrincipal().getUsername() or authentication.getPrincipal().getRole() =='ADMIN'")
     public ResponseEntity<User> getUserByUsername(@PathVariable String username) {
         User user = users.findByUsername(username);
         if (user == null) {
@@ -105,7 +105,7 @@ public class UserController {
 
     @PutMapping("/{id}")
     @JsonView(AppViews.Public.class)
-    @PostAuthorize("#u.getId() == authentication.getPrincipal().getId() or authentication.getPrincipal().getRole() =='ADMIN'")
+    @PreAuthorize("#u.getId() == authentication.getPrincipal().getId() or authentication.getPrincipal().getRole() =='ADMIN'")
     public ResponseEntity<User> updateUser(@RequestBody User u, @PathVariable long id) {
 
         User oldUser = users.findById(id).orElse(null);
@@ -126,7 +126,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    @PostAuthorize("#id == authentication.getPrincipal().getId() or authentication.getPrincipal().getRole() =='ADMIN'")
+    @PreAuthorize("#id == authentication.getPrincipal().getId() or authentication.getPrincipal().getRole() =='ADMIN'")
     public ResponseEntity<?> deleteUser(@PathVariable long id) {
 
         User user = users.findById(id).orElse(null);

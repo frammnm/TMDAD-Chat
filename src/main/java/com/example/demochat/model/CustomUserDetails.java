@@ -62,6 +62,26 @@ public class CustomUserDetails extends User implements UserDetails {
         return true;
     }
 
+
+    public boolean belongsToGroup(long id) {
+
+        if (this.user.isGroupOwner(id) || this.user.isGroupMember(id)) {
+            return true;
+        };
+
+        return false;
+    }
+
+    @Override
+    public boolean isGroupOwner(long id) {
+        return this.user.isGroupOwner(id);
+    }
+
+    @Override
+    public boolean isGroupMember(long id) {
+        return this.user.isGroupMember(id);
+    }
+
     @Override
     public long getId() {
         return this.user.getId();

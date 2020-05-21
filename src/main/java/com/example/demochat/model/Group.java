@@ -30,7 +30,7 @@ public class Group implements Serializable {
     @JsonView(AppViews.Public.class)
     private String url;
 
-    @OneToMany(mappedBy = "group", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonView(AppViews.Internal.class)
     private List<Message> messages;
 
