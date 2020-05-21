@@ -33,9 +33,6 @@ public class UserController {
     private UserRepository users;
 
     @Autowired
-    private SimpMessageSendingOperations op;
-
-    @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
     @Autowired

@@ -33,6 +33,11 @@ let conversation = {
 }
  */
 
+function getHeaders(){
+    let headers = { Authorization: 'Bearer ' + sessionStorage.getItem("session-token")};
+    return headers
+}
+
 //Class Functions
 function getConvName(jQueryConv = $('.active-chat')){
     return jQueryConv.find('h5').text().split('|')[0];
@@ -124,7 +129,7 @@ function connect() {
 
     let socket = new SockJS('/stomp');
     stompClient = Stomp.over(socket);
-    stompClient.connect({}, function (frame) {
+    stompClient.connect(getHeaders(), function (frame) {
         setConnected(true);
         console.log('Connected: ' + frame);
 
@@ -138,7 +143,7 @@ function connect() {
             message.type = messageType.Notice;
             message.received = true;
             handleMessage(message);
-        });
+        }, getHeaders());
 
         //Subscribe to personal messages
         stompClient.subscribe('/queue/'+user.username, function (m) {
@@ -147,7 +152,7 @@ function connect() {
             message.type = messageType.Direct;
             message.received = true;
             handleMessage(message);
-        });
+        }, getHeaders());
     });
 }
 
@@ -179,7 +184,7 @@ function subscribeToGroups(groups) {
                 message.received = true;
                 handleMessage(message);
             }
-        });
+        }, getHeaders());
     });
 }
 
@@ -226,7 +231,7 @@ function sendMessage(all = false) {
         message.body = $('#message-all').val();
         message.sent_to = 'all';
         //Send text message
-        stompClient.send("/app/messageAll", {}, JSON.stringify(message));
+        stompClient.send("/app/messageAll", getHeaders(), JSON.stringify(message));
         finishProcess();
         return;
     }
@@ -248,11 +253,11 @@ function sendMessage(all = false) {
     switch(convType) {
         case messageType.Group:
             //case: Group text
-            stompClient.send("/app/groupMessage", {}, JSON.stringify(message));
+            stompClient.send("/app/groupMessage", getHeaders(), JSON.stringify(message));
             break;
         default:
             //case: Direct text
-            stompClient.send("/app/message", {}, JSON.stringify(message));
+            stompClient.send("/app/message", getHeaders(), JSON.stringify(message));
     }
 
     //Update UI and object
@@ -437,7 +442,7 @@ function getGroupMessagesAPI(group){
         url: apiURL+"/groups/"+group.id+"/messages",
         type: "GET",
         contentType: 'application/json; charset=utf-8',
-        headers: { Authorization: 'Bearer ' + sessionStorage.getItem("session-token")},
+        headers: getHeaders(),
         success: function(resultData) {
             //console.log(resultData);
             let messages = resultData;
@@ -468,7 +473,7 @@ function addUserToGroupAPI(userId, groupId){
         type: "PUT",
         data: JSON.stringify(sendObject),
         contentType: 'application/json; charset=utf-8',
-        headers: { Authorization: 'Bearer ' + sessionStorage.getItem("session-token")},
+        headers: getHeaders(),
         success: function(resultData) {
             console.log(resultData);
             finishProcess();
@@ -485,7 +490,7 @@ function getUsersAPI(){
         url: apiURL+"/users/",
         type: "GET",
         contentType: 'application/json; charset=utf-8',
-        headers: { Authorization: 'Bearer ' + sessionStorage.getItem("session-token")},
+        headers: getHeaders(),
         success: function(resultData) {
             console.log(resultData);
             let users = resultData;
@@ -522,7 +527,7 @@ function uploadFileAPI(message, convIndex=-1) {
         //timeout: 600000,
         contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
         processData: false, // NEEDED, DON'T OMIT THIS
-        headers: { Authorization: 'Bearer ' + sessionStorage.getItem("session-token")},
+        headers: getHeaders(),
         success: function(path) {
             finishProcess();
             let pathArray = path.split('/');
@@ -555,7 +560,7 @@ function createGroupAPI(groupName = ''){
         type: 'POST',
         dataType: 'json',
         contentType: 'application/json',
-        headers: { Authorization: 'Bearer ' + sessionStorage.getItem("session-token")},
+        headers: getHeaders(),
         success: function(res) {
             console.log(res);
             user.ownedGroups.push(res);
