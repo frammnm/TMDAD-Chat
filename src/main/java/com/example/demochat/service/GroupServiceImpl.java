@@ -4,6 +4,10 @@ import com.example.demochat.model.*;
 import com.example.demochat.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.example.demochat.service.MyUserDetailsService;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -16,6 +20,9 @@ public class GroupServiceImpl implements GroupService {
     @Autowired
     private UserRepository users;
 
+    @PersistenceContext
+    private EntityManager em;
+
     @Override
     public  List<Group> getAllGroups() {
         return groups.findAll();
@@ -23,7 +30,16 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public  Group createGroup(String name, User owner) {
-        return groups.save(new Group(name, owner));
+        User user = users.findById(owner.getId()).orElse(null);
+
+        if (user == null) {
+            return null;
+        }
+
+        Group group = groups.save(new Group(name, user));
+        group.setOwner(user);
+
+        return group;
     };
 
     @Override
@@ -65,7 +81,23 @@ public class GroupServiceImpl implements GroupService {
     };
 
     @Override
+    @Transactional
     public  void deleteGroup(Long id) {
 
+        Group currentGroup = groups.findById(id).orElse(null);
+        for (User user : currentGroup.getMembers()) {
+            List<Group> userGroups = user.getGroups();
+            userGroups.remove(currentGroup);
+            user.setGroups(userGroups);
+        }
+
+        User owner = currentGroup.getOwner();
+        List<Group> ownerGroups = owner.getOwnedGroups();
+        ownerGroups.remove(currentGroup);
+
+        em.remove(currentGroup);
+        em.flush();
+
     };
+
 }

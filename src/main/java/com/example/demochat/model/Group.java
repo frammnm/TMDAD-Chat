@@ -30,8 +30,8 @@ public class Group implements Serializable {
     @JsonView(AppViews.Public.class)
     private String url;
 
-    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JsonView(AppViews.Internal.class)
+    @OneToMany(mappedBy = "group", orphanRemoval = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonView(AppViews.Public.class)
     private List<Message> messages;
 
     @ManyToMany(mappedBy = "groups", cascade = CascadeType.ALL)

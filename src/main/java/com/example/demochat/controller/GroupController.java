@@ -59,9 +59,10 @@ public class GroupController {
 
     @PutMapping("/{id}")
     @JsonView(AppViews.Public.class)
-    @PreAuthorize("#g.getOwner.getId() == authentication.getPrincipal().getId() or authentication.getPrincipal().getRole() =='ADMIN'")
+    @PreAuthorize("#g.getOwner().getId() == authentication.getPrincipal().getId() or authentication.getPrincipal().getRole() =='ADMIN'")
     public  ResponseEntity<Group> updateGroup(@RequestBody Group g) {
-
+//        System.out.println("######################");
+//        System.out.println(g.getOwner());
         Group oldGroup = groupService.getGroupById(g.getId());
         if (oldGroup == null) {
             return ResponseEntity.notFound().build(); //.body("Username not found")
@@ -73,7 +74,6 @@ public class GroupController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().build(); //"Wrong Object"
         }
-
     }
 
     @GetMapping("/{id}/messages")
@@ -92,7 +92,7 @@ public class GroupController {
 
     @PutMapping("/addMember")
     @JsonView(AppViews.Public.class)
-    @PreAuthorize("authentication.getPrincipal().isGroupOwner(#id) or authentication.getPrincipal().getRole() =='ADMIN'")
+    @PreAuthorize("authentication.getPrincipal().isGroupOwner(#req.getGroup_id()) or authentication.getPrincipal().getRole() =='ADMIN'")
     public ResponseEntity<Group> addMemberToGroup(@RequestBody AddMemberRequest req) {
 
         Group group = groupService.addMemberToGroup(req.getGroup_id(), req.getMember_id());
@@ -105,7 +105,22 @@ public class GroupController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteGroup(@PathVariable long id) {
-        groups.deleteById(id);
+    @JsonView(AppViews.Public.class)
+    @PreAuthorize("authentication.getPrincipal().isGroupOwner(#id) or authentication.getPrincipal().getRole() =='ADMIN'")
+    public  ResponseEntity<?> deleteGroup(@PathVariable long id) {
+
+        Group group = groupService.getGroupById(id);
+        if (group == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        groupService.deleteGroup(id);
+
+        Group groupDeleted = groupService.getGroupById(id);
+        if (groupDeleted == null) {
+            return ResponseEntity.ok().build();
+        }
+
+        return ResponseEntity.badRequest().build();
     }
 }
