@@ -1,7 +1,6 @@
 package com.example.demochat.service;
 
 import com.example.demochat.model.Message;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.MessageHeaders;
@@ -14,9 +13,6 @@ import java.util.Map;
 
 @Service
 public class MetricServiceImpl implements MetricService {
-
-    @Autowired
-    RabbitTemplate rabbitTemplate;
 
     @Autowired
     private SimpMessageSendingOperations op;
@@ -38,7 +34,6 @@ public class MetricServiceImpl implements MetricService {
         map.put(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON);
 
         //Check if its group, change queue for topic
-        //op.convertAndSend("/queue/chat-metrics", m, map);
-        //rabbitTemplate.convertAndSend(exchange, routingkey, m);
+        op.convertAndSend("/queue/chat-metrics", m, map);
     }
 }
