@@ -1,6 +1,7 @@
 package com.example.demochat.configuration;
 
 import com.example.demochat.service.MessageService;
+import com.example.demochat.service.MetricService;
 import com.example.demochat.service.WebSocketAuthenticatorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -25,7 +26,7 @@ public class AuthChannelInterceptorImpl implements ChannelInterceptor {
     private WebSocketAuthenticatorService webSocketAuthenticatorService;
 
     @Autowired
-    private MessageService messageService;
+    private MetricService metricService;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) throws AuthenticationException {
@@ -57,7 +58,7 @@ public class AuthChannelInterceptorImpl implements ChannelInterceptor {
             System.out.println(accessor.getDestination());
             MappingJackson2MessageConverter jacksonMessageConverter = new MappingJackson2MessageConverter();
             com.example.demochat.model.Message m = (com.example.demochat.model.Message) jacksonMessageConverter.fromMessage(message, com.example.demochat.model.Message.class);
-            messageService.processMessageSent(m);
+            metricService.processMessageSent(m);
         }
 
         return message;

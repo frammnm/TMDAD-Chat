@@ -9,5 +9,4 @@ public interface MessageService {
     public abstract void sendMessage(Message m);
     public abstract void broadcastMessage(Message m);
     public abstract void sendGroupMessage(Message m);
-    public abstract void processMessageSent(Message m);
 }

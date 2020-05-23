@@ -68,15 +68,4 @@ public class MessageServiceImpl implements MessageService {
         savedMessage.setGroup(group);
         messages.save(savedMessage);
     }
-
-    @Override
-    public void processMessageSent(Message m) {
-        //send message using the broker
-        //System.out.println(m);
-        System.out.println(m.getId());
-        System.out.println(m.getBody());
-        System.out.println(m.getSent_from());
-        System.out.println(m.getSent_to());
-        System.out.println(m.getTimestamp());
-    }
 }
