@@ -61,8 +61,7 @@ public class GroupController {
     @JsonView(AppViews.Public.class)
     @PreAuthorize("#g.getOwner().getId() == authentication.getPrincipal().getId() or authentication.getPrincipal().getRole() =='ADMIN'")
     public  ResponseEntity<Group> updateGroup(@RequestBody Group g) {
-//        System.out.println("######################");
-//        System.out.println(g.getOwner());
+
         Group oldGroup = groupService.getGroupById(g.getId());
         if (oldGroup == null) {
             return ResponseEntity.notFound().build(); //.body("Username not found")
