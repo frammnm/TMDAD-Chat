@@ -14,7 +14,7 @@ public class User implements Serializable {
     @JsonView(AppViews.Public.class)
     private long id;
 
-    @Column(name = "username")
+    @Column(name = "username", unique = true)
     @JsonView(AppViews.Public.class)
     private String username;
 
@@ -30,6 +30,7 @@ public class User implements Serializable {
 
 
     @Column(name = "role")
+    @JsonView(AppViews.Public.class)
     private String role;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
@@ -40,7 +41,7 @@ public class User implements Serializable {
     private List<Group> groups;
 
 
-    @OneToMany(targetEntity = Group.class, mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(targetEntity = Group.class, mappedBy = "owner", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonView(AppViews.Public.class)
     private List<Group> ownedGroups;
 
