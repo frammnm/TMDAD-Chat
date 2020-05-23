@@ -33,6 +33,7 @@ public class JwtTokenUtil {
         return extractClaim(token, Claims::getExpiration);
     }
 
+    //Esto retorna una excepcion que no se esta atrapando
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);

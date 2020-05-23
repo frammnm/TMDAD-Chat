@@ -39,20 +39,8 @@ public class MessageController {
         messageService.sendGroupMessage(m);
     }
 
-    @PostMapping("/groupMessage")
-    @JsonView(AppViews.Public.class)
-    public Message sendGroupMessageHTTP(Message m) {
-        return messageService.sendGroupMessageHTTP(m);
-    }
-
     @MessageMapping("/messageAll")
     public void broadcastMessage(Message m) {
         messageService.broadcastMessage(m);
-    }
-
-    @PostMapping("/send")
-    @JsonView(AppViews.Public.class)
-    public Message sendMessageHTTP(@RequestBody Message m) {
-        return messageService.sendMessageHTTP(m);
     }
 }
