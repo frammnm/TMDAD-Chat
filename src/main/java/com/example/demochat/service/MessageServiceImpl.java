@@ -7,6 +7,7 @@ import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MimeTypeUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -53,6 +54,7 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
+    @Transactional
     public void sendGroupMessage(Message m) {
         //send message using the broker
         Map<String, Object> map = new HashMap<>();
@@ -62,6 +64,7 @@ public class MessageServiceImpl implements MessageService {
         Message savedMessage = messages.save(m);
         Group group = groups.findByName(m.getSent_to());
 
+//        Hibernate.initialize(group.getMessages());
         List<Message> groupMessages = group.getMessages();
         groupMessages.add(savedMessage);
         group.setMessages(groupMessages);
