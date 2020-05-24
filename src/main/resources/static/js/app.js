@@ -10,6 +10,7 @@ const messageType = {
     Direct: 'Direct',
     Group: 'Group'
 }
+const trendingTopic = "metrics.trending";
 
 let stompClient = null;
 let user = null;
@@ -161,7 +162,7 @@ function connect() {
 
         //Subscribe to metrics
         if (user.role == userRoles.admin) {
-            stompClient.subscribe('/topic/metrics.trending', function (res) {
+            stompClient.subscribe('/topic/'+trendingTopic, function (res) {
                 console.log(res);
                 let message = JSON.parse(res.body);
                 //metric structure
@@ -267,7 +268,7 @@ function sendMessage(all = false) {
 
     switch(convType) {
         case messageType.Group:
-            message.group = conversations[convIndex].receiver;
+            //message.group = conversations[convIndex].receiver;
             //case: Group text
             stompClient.send("/app/groupMessage", getHeaders(), JSON.stringify(message));
             break;
