@@ -12,14 +12,27 @@ input:focus, button:focus {
     background-color: #337abe;
 }
 
+.main-content{
+    padding-left: 50px;
+    padding-right: 20px;
+    display: none;
+}
+
+#charts-container{
+    padding-right: 50px;
+}
+
+.card {
+    box-shadow: 10px 10px 15px 0px;
+}
+
 .container {
     margin: auto;
     height: 100%;
 }
 
 .view-container {
-    padding: 50px 0;
-    height: 100%;
+    padding: 30px 0;
 }
 
 .inbox-container {
@@ -28,7 +41,8 @@ input:focus, button:focus {
     overflow: hidden;
     width: 100%;
     background: white;
-    box-shadow: 10px 10px 20px 0px;
+    box-shadow: 10px 10px 15px 0px;
+    border-radius: .25rem;
 }
 
 .inbox-people {
@@ -69,7 +83,7 @@ input:focus, button:focus {
 }
 
 .inbox-list {
-    max-height: 600px;
+    max-height: 650px;
     overflow-y: auto;
 }
 
@@ -110,11 +124,11 @@ input:focus, button:focus {
 }
 
 .height-container {
-    height: 600px;
+    height: 650px;
 }
 
 .message-history {
-    max-height: 600px;
+    max-height: 650px;
     overflow-y: auto;
     position: absolute;
     bottom: 50px;
@@ -190,6 +204,14 @@ input:focus, button:focus {
     font-size: 15px;
     min-height: 48px;
     width: 100%;
+}
+
+.message-file-container{
+    right: -40px;
+}
+
+.message-send-container {
+    right: -20px;
 }
 
 .message-send-btn, .message-attach-btn {

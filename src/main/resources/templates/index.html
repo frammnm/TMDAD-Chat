@@ -13,32 +13,12 @@
         enabled. Please enable Javascript and reload this page!</h2>
 </noscript>
 
-<div id="main-content" class="container">
-    <!--
-    <nav class="navbar navbar-dark navbar-expand-sm">
-        <form class="mx-2 my-auto d-inline w-100" id="conexion" action="conexion" method="get">
-            <div class="input-group">
-                <input class="form-control" type="text" id="username" name="username" placeholder="Your username here..."/>
-                <span class="input-group-append">
-                    <button id="connect" class="btn btn-secondary" type="submit">Connect</button>
-                    <button id="disconnect" class="btn btn-secondary" type="submit" disabled="disabled">Disconnect
-                    </button>
-                </span>
-            </div>
-        </form>
-    </nav>
-    <br>
-    -->
-    <!-- <h3 class=" text-center">Bienvenido: User</h3> -->
-    <div id="messaging-app" class="view-container row">
+<div id="messaging-app" class="row main-content">
+    <div class="view-container col-md-12">
         <div class="inbox-container row">
             <div class="col-md-4 inbox-people">
                 <div class="row heading-search">
-                    <!--
-                    <div class="col-md-3">
-                        <h4 class="srch-bar-heading">Recent</h4>
-                    </div>
-                    -->
+
                     <div class="col-md-10 srch-bar">
                         <input type="text" class="search-bar" id="convSearchbar" placeholder="Search" >
                         <span class="input-group-addon">
@@ -52,7 +32,7 @@
                             <button class="dropdown-item" type="button" data-toggle="modal" data-target="#actionModal" data-sending="conv-new">Nueva Conversación</button>
                             <button class="dropdown-item" type="button" data-toggle="modal" data-target="#actionModal" data-sending="group-new">Crear Grupo</button>
                             <button class="dropdown-item" type="button" data-toggle="modal" data-target="#actionModal" data-sending="group-addPerson">Agregar a Grupo</button>
-                            <button class="dropdown-item" type="button" data-toggle="modal" data-target="#actionModal" data-sending="send-all">Enviar a Todos</button>
+                            <button class="dropdown-item admin-item" type="button" data-toggle="modal" data-target="#actionModal" data-sending="send-all">Enviar a Todos</button>
                             <button class="dropdown-item" type="button" id="logout">Cerrar Sesión</button>
                         </div>
                     </div>
@@ -108,13 +88,13 @@
                     <div class="col-md-10 input-message-write">
                         <input id="message-text" type="text" class="write-msg" placeholder="Type a message" />
                     </div>
-                    <div class="col-md-1">
+                    <div class="col-md-1 message-file-container">
                         <label for="file-input" class="message-attach-btn">
                             <i class="attach-file fa fa-paperclip" aria-hidden="true"></i>
                         </label>
                         <input id="file-input" type="file"/>
                     </div>
-                    <div class="col-md-1">
+                    <div class="col-md-1  message-send-container">
                         <button id="send-message" class="message-send-btn" type="button"><i class="far fa-paper-plane"></i></button>
                     </div>
                 </div>
@@ -123,6 +103,37 @@
     </div>
 </div>
 
+<div id="charts-container" class="row main-content admin-item">
+    <div class="view-container col-md-12">
+        <div class="row charts-container-inner">
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <canvas id="wordCount"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <canvas id="senderScore"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <canvas id="receiverScore"></canvas>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
 
 <!-- Modal de Crear conversacion -->
 <div class="modal fade" id="actionModal" tabindex="-1" role="dialog" aria-labelledby="actionModal" aria-hidden="true">
@@ -179,13 +190,13 @@
     </div>
 </div>
 
-
-
 <script src="../webjars/jquery/jquery.min.js"></script>
 <script src="../webjars/sockjs-client/sockjs.min.js"></script>
 <script src="../webjars/stomp-websocket/stomp.min.js"></script>
 <script src="../webjars/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
 <script src="../webjars/font-awesome/5.12.0/js/all.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+<script src="./js/chart-logic.js"></script>
 <script src="./js/app.js"></script>
 </body>
 </html>

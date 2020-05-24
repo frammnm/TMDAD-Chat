@@ -1,6 +1,10 @@
 const defaultTimeout = 120000;
 const apiURL = "/api/v1";
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const userRoles = {
+    user: 'USER',
+    admin: 'ADMIN'
+}
 const messageType = {
     Notice: 'Notice',
     Direct: 'Direct',
@@ -98,6 +102,7 @@ function setConnected(connected) {
     }
     else {
         $("#messaging-app").hide();
+        $("#charts-container").hide();
         stompClient = null;
         user = null;
         groups = null;
@@ -153,6 +158,16 @@ function connect() {
             message.received = true;
             handleMessage(message);
         }, getHeaders());
+
+        //Subscribe to metrics
+        if (user.role == userRoles.admin) {
+            stompClient.subscribe('/topic/metrics.trending', function (res) {
+                console.log(res);
+                let message = JSON.parse(res.body);
+                //metric structure
+                handleMetricReceived(res);
+            }, getHeaders());
+        }
     });
 }
 
@@ -628,6 +643,13 @@ function initApp(){
     user = JSON.parse(sessionStorage.getItem('session-user'));
     console.log(user);
     if (user){
+
+        if (user.role == userRoles.admin){
+            $(".admin-item").show();
+        }else{
+            $(".admin-item").hide();
+        }
+
         connect();
         getUsersAPI();
     } else {
