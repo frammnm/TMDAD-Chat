@@ -166,7 +166,7 @@ function connect() {
                 console.log(res);
                 let message = JSON.parse(res.body);
                 //metric structure
-                handleMetricReceived(res);
+                handleMetricReceived(message);
             }, getHeaders());
         }
     });
