@@ -267,6 +267,7 @@ function sendMessage(all = false) {
 
     switch(convType) {
         case messageType.Group:
+            message.group = conversations[convIndex].receiver;
             //case: Group text
             stompClient.send("/app/groupMessage", getHeaders(), JSON.stringify(message));
             break;
