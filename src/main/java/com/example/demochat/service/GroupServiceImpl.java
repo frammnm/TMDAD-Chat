@@ -75,6 +75,29 @@ public class GroupServiceImpl implements GroupService {
     };
 
     @Override
+    public  Group removeMemberToGroup(long groupId, long userId) {
+
+        Group currentGroup = groups.findById(groupId).orElse(null);
+        User user = users.findById(userId).orElse(null);
+
+        if ((user == null) || (currentGroup == null)) {
+            return null;
+        } else {
+            List<User> currentMembers = currentGroup.getMembers();
+            currentMembers.remove(user);
+            currentGroup.setMembers(currentMembers);
+
+            List<Group> userGroups = user.getGroups();
+            userGroups.remove(currentGroup);
+            user.setGroups(userGroups);
+            users.save(user);
+        }
+
+        return groups.save(currentGroup);
+
+    };
+
+    @Override
     @Transactional
     public  void deleteGroup(Long id) {
 

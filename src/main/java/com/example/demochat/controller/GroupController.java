@@ -107,6 +107,21 @@ public class GroupController {
         return ResponseEntity.ok(group);
     }
 
+    @PostMapping("/removeMember")
+    @JsonView(AppViews.Public.class)
+    @PreAuthorize("authentication.getPrincipal().isGroupOwner(#req.getGroup_id()) or authentication.getPrincipal().getRole() =='ADMIN'")
+    public ResponseEntity<Group> removeMemberToGroup(@RequestBody AddMemberRequest req) {
+
+        Group group = groupService.removeMemberToGroup(req.getGroup_id(), req.getMember_id());
+
+        if (group == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(group);
+    }
+
+
     @DeleteMapping("/{id}")
     @JsonView(AppViews.Public.class)
     @PreAuthorize("authentication.getPrincipal().isGroupOwner(#id) or authentication.getPrincipal().getRole() =='ADMIN'")

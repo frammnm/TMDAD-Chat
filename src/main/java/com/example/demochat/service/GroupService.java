@@ -9,7 +9,7 @@ public interface GroupService {
     Group createGroup(String name, User owner);
     Group getGroupById(Long id);
     Group updateGroup(Group g);
-//    List<Message> getGroupMessages(Long id);
     Group addMemberToGroup(long groupId, long userId);
+    Group removeMemberToGroup(long groupId, long userId);
     void deleteGroup(Long id);
 }
