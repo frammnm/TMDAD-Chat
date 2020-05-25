@@ -4,6 +4,7 @@ const metricPosition = {
     senderScore: 1,
     receiverScore: 2
 }
+const max_graph_elems = 20;
 
 const colors = [
     'rgba(255, 99, 132, 0.2)',
@@ -29,7 +30,7 @@ function handleMetricReceived(metric){
 }
 
 function updateChart(chart, data){
-    let labels = Object.getOwnPropertyNames(data);
+    let labels = Object.getOwnPropertyNames(data).slice(0,max_graph_elems);
     let values = [];
 
     chart.data.labels = labels;
@@ -44,11 +45,11 @@ function updateChart(chart, data){
         dataset.borderColor = [];
 
         //Change colors
-        values.forEach(function(val) {
-            let index = Math.floor(Math.random() * colors.length);
-            dataset.backgroundColor.push(colors[index]);
-            dataset.borderColor.push(colors[index]);
-        });
+        for (let i = 0; i < values.length; i++) {
+            let colorIndex = i % colors.length;
+            dataset.backgroundColor.push(colors[colorIndex]);
+            dataset.borderColor.push(colors[colorIndex]);
+        }
     });
 
     chart.update();
