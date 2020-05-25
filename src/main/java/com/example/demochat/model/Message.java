@@ -3,7 +3,6 @@ package com.example.demochat.model;
 import javax.persistence.*;
 import com.fasterxml.jackson.annotation.JsonView;
 import java.io.Serializable;
-import java.util.List;
 
 @Entity
 @Table(name = "messages")

@@ -5,8 +5,8 @@ import com.example.demochat.model.Message;
 import java.util.List;
 
 public interface MessageService {
-    public abstract List<Message> getAllMessages();
-    public abstract void sendMessage(Message m);
-    public abstract void broadcastMessage(Message m);
-    public abstract void sendGroupMessage(Message m);
+    List<Message> getAllMessages();
+    void sendMessage(Message m);
+    void broadcastMessage(Message m);
+    void sendGroupMessage(Message m);
 }

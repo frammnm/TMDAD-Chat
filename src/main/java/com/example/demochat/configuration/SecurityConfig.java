@@ -9,24 +9,13 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import com.example.demochat.service.*;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.sql.DataSource;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import org.springframework.security.core.Authentication;
-
-import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
@@ -42,7 +31,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private JwtRequestFilter jwtFiler;
 
     private static final String[] AUTH_WHITELIST = {
-
 
             //Login & Register
             "/api/v1/users/signin",

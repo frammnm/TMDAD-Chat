@@ -17,24 +17,13 @@ public class MetricServiceImpl implements MetricService {
     @Autowired
     private SimpMessageSendingOperations op;
 
-    @Value("${metrics.rabbitmq.exchange}")
-    String exchange;
-
-    @Value("${metrics.rabbitmq.routingkey}")
-    private String routingkey;
+    @Value("${metrics.rabbitmq.queue}")
+    private String metricQueue;
 
     @Override
     public void processMessageSent(Message m) {
-        //send message using the broker
-        System.out.println(m.getBody());
-        System.out.println(m.getSent_from());
-        System.out.println(m.getSent_to());
-//        System.out.println(m.getGroup());
-
         Map<String,Object> map = new HashMap<>();
         map.put(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON);
-
-        //Check if its group, change queue for topic
-        op.convertAndSend("/queue/chat-metrics", m, map);
+        op.convertAndSend("/queue/" + metricQueue, m, map);
     }
 }

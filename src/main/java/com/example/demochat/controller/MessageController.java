@@ -3,18 +3,11 @@ package com.example.demochat.controller;
 import java.util.List;
 
 import com.example.demochat.model.*;
-import com.example.demochat.repository.MessageRepository;
 import com.example.demochat.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import com.fasterxml.jackson.annotation.*;
-import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.util.MimeTypeUtils;
-import java.util.HashMap;
-import java.util.Map;
-
 
 @RestController
 @RequestMapping("/api/v1/messages")

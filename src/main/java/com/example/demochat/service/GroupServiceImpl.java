@@ -4,7 +4,6 @@ import com.example.demochat.model.*;
 import com.example.demochat.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.example.demochat.service.MyUserDetailsService;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,11 +51,6 @@ public class GroupServiceImpl implements GroupService {
         return groups.save(g);
     };
 
-//    @Override
-//    public  List<Message> getGroupMessages(Long id) {
-//
-//    };
-
     @Override
     public  Group addMemberToGroup(long groupId, long userId) {
 
@@ -97,7 +91,6 @@ public class GroupServiceImpl implements GroupService {
 
         em.remove(currentGroup);
         em.flush();
-
     };
 
 }

@@ -3,6 +3,7 @@ package com.example.demochat.service;
 import com.example.demochat.model.*;
 import com.example.demochat.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,9 @@ public class MessageServiceImpl implements MessageService {
     @Autowired
     private SimpMessageSendingOperations op;
 
+    @Value("${chat.rabbitmq.topic.broadcast}")
+    private String broadcastTopic;
+
     @Override
     public List<Message> getAllMessages() {
         return messages.findAll();
@@ -35,6 +39,7 @@ public class MessageServiceImpl implements MessageService {
         Map<String,Object> map = new HashMap<>();
         map.put(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON);
         String sendPath = "queue";
+
         //Check if its group, change queue for topic
         op.convertAndSend("/" + sendPath + "/" + m.getSent_to(), m, map);
 
@@ -44,10 +49,9 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public void broadcastMessage(Message m) {
-        //send message using the broker
         Map<String,Object> map = new HashMap<>();
         map.put(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON);
-        op.convertAndSend("/topic/all", m, map);
+        op.convertAndSend("/topic/" + broadcastTopic, m, map);
 
         //save in db
         messages.save(m);
@@ -56,7 +60,6 @@ public class MessageServiceImpl implements MessageService {
     @Override
     @Transactional
     public void sendGroupMessage(Message m) {
-        //send message using the broker
         Map<String, Object> map = new HashMap<>();
         map.put(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON);
         op.convertAndSend("/topic/" + m.getSent_to(), m, map);
@@ -64,7 +67,6 @@ public class MessageServiceImpl implements MessageService {
         Message savedMessage = messages.save(m);
         Group group = groups.findByName(m.getSent_to());
 
-//        Hibernate.initialize(group.getMessages());
         List<Message> groupMessages = group.getMessages();
         groupMessages.add(savedMessage);
         group.setMessages(groupMessages);

@@ -8,13 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import com.fasterxml.jackson.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.MimeTypeUtils;
 import com.example.demochat.service.GroupService;
-import java.util.HashMap;
-import java.util.Map;
-
 
 @RestController
 @RequestMapping("/api/v1/groups")

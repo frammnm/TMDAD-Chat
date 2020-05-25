@@ -14,8 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 @Service
 public class JwtTokenUtil {
 
-//    private String SECRET_KEY = "secret";
-
     private static final long serialVersionUID = -2550185165626007488L;
 
     public static final long JWT_TOKEN_VALIDITY = 10 * 60 * 60;

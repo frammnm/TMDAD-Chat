@@ -7,22 +7,14 @@ import com.example.demochat.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import com.fasterxml.jackson.annotation.*;
-import org.springframework.messaging.MessageHeaders;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.util.MimeTypeUtils;
-import java.util.HashMap;
-import java.util.Map;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.userdetails.UserDetails;
 import com.example.demochat.service.MyUserDetailsService;
 import com.example.demochat.configuration.JwtTokenUtil;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.access.prepost.PostAuthorize;
-
 
 @RestController
 @RequestMapping("/api/v1/users")
