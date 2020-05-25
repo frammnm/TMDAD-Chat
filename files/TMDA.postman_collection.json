@@ -6,7 +6,7 @@
 	},
 	"item": [
 		{
-			"name": "http://localhost:8080/api/v1/users/",
+			"name": "GET all users",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
@@ -18,6 +18,11 @@
 						"name": "Content-Type",
 						"type": "text",
 						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmcmFuY2lzY28iLCJleHAiOjE1ODk5NDg5MDAsImlhdCI6MTU4OTkxMjkwMH0.TRSdb3-Gn5nlkE5QrOTHYEMXYLun26AFAeJ024JnFDU5phPx7q6d9zoA7Wt7ATtAXQxcf6d4ZHXM8Xo2wSws1A",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -47,15 +52,15 @@
 			"response": []
 		},
 		{
-			"name": "http://localhost:8080/api/v1/users/signup",
+			"name": "POST Signup",
 			"request": {
 				"method": "POST",
 				"header": [
 					{
 						"key": "Content-Type",
 						"name": "Content-Type",
-						"value": "application/json",
-						"type": "text"
+						"type": "text",
+						"value": "application/json"
 					}
 				],
 				"body": {
@@ -85,7 +90,7 @@
 			"response": []
 		},
 		{
-			"name": "http://localhost:8080/api/v1/messages/",
+			"name": "GET All messages",
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -107,20 +112,25 @@
 			"response": []
 		},
 		{
-			"name": "http://localhost:8080/api/v1/groups/create",
+			"name": "POST Group",
 			"request": {
 				"method": "POST",
 				"header": [
 					{
 						"key": "Content-Type",
 						"name": "Content-Type",
-						"value": "application/json",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJyb2JlcnRvIiwiZXhwIjoxNTkwMTI2NDk0LCJpYXQiOjE1OTAwOTA0OTR9.4_mwopkv5UMhbOygRSkgpSqcPL_rV7D4UVtzvoCnqtFsRq2q_8_TfiGBSkC-1ud5yU0rRmtOjcq-wgShyaK3IA",
 						"type": "text"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"4\",\n\t\"owner\": {\n\t\t\"id\": 1,\n\t    \"username\": \"francisco\",\n\t    \"password\": \"admin1\",\n\t    \"role\": \"admin\"\n\t\t}\n}",
+					"raw": "{\n\t\"name\": \"GrupoPruebaZuzu\",\n\t\"owner\": {\n\t    \"id\": 3,\n        \"username\": \"roberto\"\n\t\t}\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -145,12 +155,33 @@
 			"response": []
 		},
 		{
-			"name": "http://localhost:8080/api/v1/users/1",
+			"name": "POST SignIn",
 			"request": {
-				"method": "DELETE",
-				"header": [],
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmcmFuY2lzY28iLCJleHAiOjE1ODk4NjIzNjksImlhdCI6MTU4OTgyNjM2OX0.JyKXW6bkn1Y40ytR1qLf284EH9nc22RscWa2UK57RPugYObyI9Fvy-b7IyTvYiYcnu1fcTD3kaqv-WZQ_Nznzw",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\" : \"francisco\",\n\t\"password\" : \"admin1\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
-					"raw": "http://localhost:8080/api/v1/users/1",
+					"raw": "http://localhost:8080/api/v1/users/signin",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -160,14 +191,14 @@
 						"api",
 						"v1",
 						"users",
-						"1"
+						"signin"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "http://localhost:8080/api/v1/users/1",
+			"name": "PUT User by Id",
 			"request": {
 				"method": "PUT",
 				"header": [
@@ -176,11 +207,16 @@
 						"name": "Content-Type",
 						"value": "application/json",
 						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmcmFuY2lzY28iLCJleHAiOjE1ODk5NDg5MDAsImlhdCI6MTU4OTkxMjkwMH0.TRSdb3-Gn5nlkE5QrOTHYEMXYLun26AFAeJ024JnFDU5phPx7q6d9zoA7Wt7ATtAXQxcf6d4ZHXM8Xo2wSws1A",
+						"type": "text"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "\t\n{\n    \"id\": 1,\n    \"username\": \"francisco\",\n    \"password\": \"admin1\",\n    \"role\": \"admin\",\n    \"groups\": []\n}",
+					"raw": "\t\n{\n    \"id\": 1,\n    \"username\": \"francisco\",\n    \"password\": \"admin\",\n    \"enabled\": true\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -205,7 +241,7 @@
 			"response": []
 		},
 		{
-			"name": "http://localhost:8080/api/v1/groups/",
+			"name": "GET all groups",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
@@ -246,7 +282,7 @@
 			"response": []
 		},
 		{
-			"name": "http://localhost:8080/api/v1/users/1",
+			"name": "GET User by Id",
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -262,6 +298,220 @@
 						"v1",
 						"users",
 						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Group by Id",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmcmFuY2lzY28iLCJleHAiOjE1OTAxMTE2ODUsImlhdCI6MTU5MDA3NTY4NX0._J7ldozAbzYsr8UPV-s4tPTkSW029J0KonksPHMqA-bsJbg2cW9m3x76gX-9LvSyb-OU9COfDELDPSzMPciuDA",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/groups/17",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"groups",
+						"17"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT Add Member by userId and groupId",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"group_id\": 17,\n    \"member_id\": 3\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/groups/addMember",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"groups",
+						"addMember"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET User by Username",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmcmFuY2lzY28iLCJleHAiOjE1ODk5NDg5MDAsImlhdCI6MTU4OTkxMjkwMH0.TRSdb3-Gn5nlkE5QrOTHYEMXYLun26AFAeJ024JnFDU5phPx7q6d9zoA7Wt7ATtAXQxcf6d4ZHXM8Xo2wSws1A",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/users/byUsername/roberto",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"byUsername",
+						"roberto"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE User by Id",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmcmFuY2lzY28iLCJleHAiOjE1ODk5NDg5MDAsImlhdCI6MTU4OTkxMjkwMH0.TRSdb3-Gn5nlkE5QrOTHYEMXYLun26AFAeJ024JnFDU5phPx7q6d9zoA7Wt7ATtAXQxcf6d4ZHXM8Xo2wSws1A",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/users/4",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"4"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Home",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmcmFuY2lzY28iLCJleHAiOjE1OTAxMTE2ODUsImlhdCI6MTU5MDA3NTY4NX0._J7ldozAbzYsr8UPV-s4tPTkSW029J0KonksPHMqA-bsJbg2cW9m3x76gX-9LvSyb-OU9COfDELDPSzMPciuDA",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/home",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"home"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT Update group by object",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmcmFuY2lzY28iLCJleHAiOjE1OTAyODA4ODksImlhdCI6MTU5MDI0NDg4OX0.QwXmUWTPNR1L_0vtiGGyTtvrdcuM48KVs3UamH8Oej9yM6BUC99LaZb_UWnhtkYhu7e7DVQNw6wYAM5yWd07dw",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"id\": 56,\n    \"name\": \"GrupoPruebaZuzu3afterupdate\",\n    \"url\": \"/groups/GrupoPruebaZuzu3566423138\",\n    \"owner\": {\n\t    \"id\": 1\n\t\t}\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/groups/56",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"groups",
+						"56"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Group messages by groupId",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmcmFuY2lzY28iLCJleHAiOjE1OTAyODA4ODksImlhdCI6MTU5MDI0NDg4OX0.QwXmUWTPNR1L_0vtiGGyTtvrdcuM48KVs3UamH8Oej9yM6BUC99LaZb_UWnhtkYhu7e7DVQNw6wYAM5yWd07dw",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/groups/56/messages",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"groups",
+						"56",
+						"messages"
 					]
 				}
 			},
