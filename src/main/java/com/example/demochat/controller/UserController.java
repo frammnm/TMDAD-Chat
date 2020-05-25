@@ -5,6 +5,7 @@ import java.util.List;
 import com.example.demochat.model.*;
 import com.example.demochat.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import com.fasterxml.jackson.annotation.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -35,6 +36,9 @@ public class UserController {
     @Autowired
     private JwtTokenUtil TokenUtil;
 
+    @Value("${metrics.rabbitmq.queue}")
+    private String metricsQueue;
+
     @GetMapping("/")
     @JsonView(AppViews.Public.class)
     public ResponseEntity<List<User>> getAllUsers() {
@@ -45,7 +49,7 @@ public class UserController {
     @JsonView(AppViews.Public.class)
     public ResponseEntity<User> createUser(@RequestBody User u) {
 
-        if (u.getUsername().equals("chat-metrics")) {
+        if (u.getUsername().equals(metricsQueue)) {
             return ResponseEntity.badRequest().build();
         }
 

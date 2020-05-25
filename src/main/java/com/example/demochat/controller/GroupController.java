@@ -3,8 +3,8 @@ package com.example.demochat.controller;
 import java.util.List;
 
 import com.example.demochat.model.*;
-import com.example.demochat.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import com.fasterxml.jackson.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,13 +16,17 @@ import com.example.demochat.service.GroupService;
 public class GroupController {
 
     @Autowired
-    private GroupRepository groups;
-
-    @Autowired
-    private UserRepository users;
-
-    @Autowired
     private GroupService groupService;
+
+    @Value("${chat.rabbitmq.topic.broadcast}")
+    private String broadcastTopic;
+
+    @Value("${metrics.rabbitmq.topics.trending}")
+    private String metricsTrending;
+
+    @Value("${metrics.rabbitmq.routingKey}")
+    private String metricsRoutingKey;
+
 
     @GetMapping("/")
     @JsonView(AppViews.Public.class)
@@ -36,7 +40,7 @@ public class GroupController {
     @PreAuthorize("#u.getOwner().getId() == authentication.getPrincipal().getId() or authentication.getPrincipal().getRole() =='ADMIN'")
     public ResponseEntity<Group> createGroup(@RequestBody Group u) {
 
-        if (u.getName().equals("all")  ||  u.getName().equals("metrics.trending")  || u.getName().equals("metrics.chat")) {
+        if (u.getName().equals(broadcastTopic)  ||  u.getName().equals(metricsTrending)  || u.getName().equals(metricsRoutingKey)) {
             return ResponseEntity.badRequest().build();
         }
 
