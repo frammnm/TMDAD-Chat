@@ -40,6 +40,11 @@ public class GroupController {
     @JsonView(AppViews.Public.class)
     @PreAuthorize("#u.getOwner().getId() == authentication.getPrincipal().getId() or authentication.getPrincipal().getRole() =='ADMIN'")
     public ResponseEntity<Group> createGroup(@RequestBody Group u) {
+
+        if (u.getName().equals("all")  ||  u.getName().equals("metrics.trending")  || u.getName().equals("metrics.chat")) {
+            return ResponseEntity.badRequest().build();
+        }
+
         return ResponseEntity.ok(groupService.createGroup(u.getName(), u.getOwner()));
     }
 

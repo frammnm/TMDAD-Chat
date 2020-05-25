@@ -52,6 +52,11 @@ public class UserController {
     @PostMapping("/signup")
     @JsonView(AppViews.Public.class)
     public ResponseEntity<User> createUser(@RequestBody User u) {
+
+        if (u.getUsername().equals("chat-metrics")) {
+            return ResponseEntity.badRequest().build();
+        }
+
         String password = passwordEncoder.encode(u.getPassword());
         User user = users.save(new User(u.getUsername(), password));
         return ResponseEntity.ok(user);
