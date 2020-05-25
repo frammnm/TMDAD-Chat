@@ -475,8 +475,10 @@ function getGroupMessagesAPI(group){
                 handleMessage(message);
             })
         },
-        error : function(jqXHR, textStatus, errorThrown) {
-            console.log(errorThrown);
+        error : function(err) {
+            console.log(err);
+            finishProcess();
+            //alert('Ha ocurrido un error al obtener los mensajes del grupo. Por favor inténtalo más tarde');
         },
         timeout: defaultTimeout,
     });
@@ -500,8 +502,10 @@ function addUserToGroupAPI(userId, groupId){
             console.log(resultData);
             finishProcess();
         },
-        error : function(jqXHR, textStatus, errorThrown) {
-            console.log(errorThrown);
+        error : function(err) {
+            console.log(err);
+            finishProcess();
+            alert('Ha ocurrido un error al agregar un usuario al grupo. Por favor inténtalo más tarde');
         },
         timeout: defaultTimeout,
     });
@@ -522,8 +526,10 @@ function getUsersAPI(){
                 }
             })
         },
-        error : function(jqXHR, textStatus, errorThrown) {
-            console.log(errorThrown);
+        error : function(err) {
+            console.log(err);
+            //finishProcess();
+            //alert('Ha ocurrido un error al obtener los usuarios. Por favor inténtalo más tarde');
         },
         timeout: defaultTimeout,
     });
@@ -563,7 +569,7 @@ function uploadFileAPI(message, convIndex=-1) {
             finishProcess();
             let pathArray = path.split('/');
             let fileName = pathArray[pathArray.length - 1];
-            message.body += '<br> <a href="' + path +'">'+fileName+'</a>';
+            message.body += '<br> <a href="' + path +'">'+file.name+'</a>';
             if (convIndex != -1){
                 conversations[convIndex].messages.push(message);
             }
@@ -571,8 +577,9 @@ function uploadFileAPI(message, convIndex=-1) {
             console.log(path);
         },
         error: function(err) {
+            console.log(err);
             finishProcess();
-            console.log(err.responseJSON);
+            alert('Ha ocurrido un error al enviar el archivo. Por favor inténtalo más tarde');
         }
     });
 }
@@ -602,8 +609,9 @@ function createGroupAPI(groupName = ''){
             finishProcess();
         },
         error: function(err) {
-            console.log(err.responseJSON);
+            console.log(err);
             finishProcess();
+            alert('Ha ocurrido un error al crear el grupo. Por favor inténtalo más tarde');
         }
     });
 }

@@ -2,6 +2,7 @@ body {
     font-family: "Poppins", sans-serif;
     height: 100vh;
     background-color: #337abe;
+    overflow-x: hidden;
 }
 
 input:focus, button:focus {
@@ -162,6 +163,10 @@ input:focus, button:focus {
 .sent-message p {
     background: #337abe none repeat scroll 0 0;
     color: #ffffff;
+}
+
+.sent-message a {
+    color: lightblue;
 }
 
 .message-wrapper p {

@@ -6,6 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.Instant;
+import java.util.Random;
 
 import com.example.demochat.model.Message;
 import com.example.demochat.service.MessageService;
@@ -32,9 +34,11 @@ public class FilesController {
 
     @PostMapping("/upload")
     public ResponseEntity uploadToLocalFileSystem(@RequestPart("file") MultipartFile file, @RequestPart("message") Message m) {
-
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-        Path path = Paths.get(filesBasePath + fileName);
+        Random rand = new Random();
+        rand.setSeed(Instant.now().getEpochSecond());
+        String parsedFileName = Math.abs(rand.nextInt()) + "_" + fileName;
+        Path path = Paths.get(filesBasePath + parsedFileName);
         try {
             Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
@@ -42,10 +46,10 @@ public class FilesController {
         }
         String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/files/download/")
-                .path(fileName)
+                .path(parsedFileName)
                 .toUriString();
 
-        m.setBody("<a href='" + fileDownloadUri + "'>" + fileDownloadUri + "</a");
+        m.setBody(m.getBody() + "<br> <a href='" + fileDownloadUri + "'>" + fileName + "</a>");
 
         if (m.getType().equals("Group")) {
             messageService.sendGroupMessage(m);
