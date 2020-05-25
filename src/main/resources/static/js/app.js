@@ -539,7 +539,16 @@ function uploadFileAPI(message, convIndex=-1) {
         )
     );
     // Attach file
-    formData.append('file', $('#file-input')[0].files[0]);
+    let file = $('#file-input')[0].files[0];
+
+    const fsize = Math.round(file.size / 1024 / 1024);
+    // The size of the file.
+    if (fsize > 20) {
+        alert("El archivo es muy grande, seleccione un archivo de hasta 20mb.");
+        return;
+    }
+
+    formData.append('file', file);
 
     $.ajax({
         url: '/files/upload',
