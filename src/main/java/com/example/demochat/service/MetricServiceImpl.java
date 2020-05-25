@@ -15,6 +15,7 @@ import java.util.Map;
 public class MetricServiceImpl implements MetricService {
 
     @Autowired
+    @Lazy
     private SimpMessageSendingOperations op;
 
     @Value("${metrics.rabbitmq.exchange}")
