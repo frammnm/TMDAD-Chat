@@ -45,9 +45,15 @@ public class FilesController {
                 .path(fileName)
                 .toUriString();
 
-        m.setBody(fileDownloadUri);
-        messageService.sendMessage(m);
+        m.setBody("<a href='" + fileDownloadUri + "'>" + fileDownloadUri + "</a");
 
+        if (m.getType().equals("Group")) {
+            messageService.sendGroupMessage(m);
+        } else if (m.getType().equals("Direct")) {
+            messageService.sendMessage(m);
+        } else {
+            messageService.broadcastMessage(m);
+        }
         return ResponseEntity.ok(fileDownloadUri);
     }
 

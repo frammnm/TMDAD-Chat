@@ -68,6 +68,7 @@ public class MessageServiceImpl implements MessageService {
         List<Message> groupMessages = group.getMessages();
         groupMessages.add(savedMessage);
         group.setMessages(groupMessages);
+        savedMessage.setType("Group");
         savedMessage.setGroup(group);
         messages.save(savedMessage);
     }

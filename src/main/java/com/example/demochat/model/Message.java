@@ -30,10 +30,15 @@ public class Message implements Serializable {
   @JsonView(AppViews.Public.class)
   private String timestamp;
 
+
   @ManyToOne
   @JoinColumn(name="group_id")
   @JsonView(AppViews.Internal.class)
   private Group group;
+
+  @JoinColumn(name="type")
+  @JsonView(AppViews.Public.class)
+  private String type;
 
   public Message() {
     super();
@@ -44,6 +49,15 @@ public class Message implements Serializable {
     this.sent_from = sent_from;
     this.sent_to = sent_to;
     this.timestamp = timestamp;
+    this.type = "Direct";
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
   }
 
   public long getId() {
@@ -78,20 +92,20 @@ public class Message implements Serializable {
     this.sent_to = sent_to;
   }
 
-  public String getTimestamp() {
-    return timestamp;
-  }
-
-  public void setTimestamp(String timestamp) {
-    this.timestamp = timestamp;
-  }
-
   public Group getGroup() {
     return group;
   }
 
   public void setGroup(Group group) {
     this.group = group;
+  }
+
+  public String getTimestamp() {
+    return timestamp;
+  }
+
+  public void setTimestamp(String timestamp) {
+    this.timestamp = timestamp;
   }
 
 }

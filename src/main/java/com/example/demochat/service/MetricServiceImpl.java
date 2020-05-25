@@ -29,7 +29,7 @@ public class MetricServiceImpl implements MetricService {
         System.out.println(m.getBody());
         System.out.println(m.getSent_from());
         System.out.println(m.getSent_to());
-        System.out.println(m.getGroup());
+//        System.out.println(m.getGroup());
 
         Map<String,Object> map = new HashMap<>();
         map.put(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON);

@@ -240,23 +240,24 @@ function sendMessage(all = false) {
 
     let message = createMessage(user.username, getConvName(), msgBody);
     //Remove because backend doesnt support these fields
-    delete message.type;
+    //delete message.type;
     delete message.received;
 
     if (all){
         message.body = $('#message-all').val();
         message.sent_to = 'all';
+        message.type = messageType.Notice;
         //Send text message
         stompClient.send("/app/messageAll", getHeaders(), JSON.stringify(message));
         finishProcess();
         return;
     }
 
-    let convType = messageType.Direct;
+//    let convType = messageType.Direct;
     let convIndex = -1;
     conversations.forEach(function(conv, index) {
         if (conv.receiver.name == message.sent_to) {
-            convType = conv.type;
+            message.type = conv.type;
             convIndex = index;
         }
     });
@@ -266,7 +267,7 @@ function sendMessage(all = false) {
         return;
     }
 
-    switch(convType) {
+    switch(message.type) {
         case messageType.Group:
             //message.group = conversations[convIndex].receiver;
             //case: Group text
@@ -450,6 +451,7 @@ function handleNewGroup(group, active=false){
     $(".inbox-list").prepend(template);
     //If is owned, add to dropdown
     if (getOwnedGroupIndex(group.name) >= 0 ){
+        console.log(group);
         $("#owned-groups").append($("<option />").val(group.id).text(group.name));
     }
 }
@@ -485,6 +487,9 @@ function addUserToGroupAPI(userId, groupId){
         group_id: groupId,
         member_id: userId
     }
+
+    console.log(sendObject);
+
     $.ajax({
         url: apiURL+"/groups/addMember",
         type: "PUT",
@@ -582,9 +587,9 @@ function createGroupAPI(groupName = ''){
             console.log(res);
             user.ownedGroups.push(res);
             $('.active-chat').removeClass('active-chat');
-            handleNewGroup(group);
+            handleNewGroup(res);
             refreshMessages();
-            subscribeToGroups([group]);
+            subscribeToGroups([res]);
             finishProcess();
         },
         error: function(err) {

@@ -61,6 +61,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             //Stomp & Broker
             "/stomp/**",
 
+            //File download
+            "/files/download/**",
 
             // -- swagger ui
             "/swagger-resources/**",
