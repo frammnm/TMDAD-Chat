@@ -93,7 +93,7 @@ public class GroupController {
         return ResponseEntity.ok(group.getMessages());
     }
 
-    @PutMapping("/addMember")
+    @PostMapping("/addMember")
     @JsonView(AppViews.Public.class)
     @PreAuthorize("authentication.getPrincipal().isGroupOwner(#req.getGroup_id()) or authentication.getPrincipal().getRole() =='ADMIN'")
     public ResponseEntity<Group> addMemberToGroup(@RequestBody AddMemberRequest req) {

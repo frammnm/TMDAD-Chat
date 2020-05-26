@@ -480,6 +480,7 @@ function getGroupMessagesAPI(group){
             finishProcess();
             //alert('Ha ocurrido un error al obtener los mensajes del grupo. Por favor inténtalo más tarde');
         },
+
         timeout: defaultTimeout,
     });
 }
@@ -490,22 +491,47 @@ function addUserToGroupAPI(userId, groupId){
         member_id: userId
     }
 
-    console.log(sendObject);
-
     $.ajax({
         url: apiURL+"/groups/addMember",
-        type: "PUT",
+        type: "POST",
         data: JSON.stringify(sendObject),
         contentType: 'application/json; charset=utf-8',
         headers: getHeaders(),
         success: function(resultData) {
             console.log(resultData);
             finishProcess();
+            alert('Se ha agregado el usuario al grupo.');
         },
         error : function(err) {
             console.log(err);
             finishProcess();
             alert('Ha ocurrido un error al agregar un usuario al grupo. Por favor inténtalo más tarde');
+        },
+        timeout: defaultTimeout,
+    });
+}
+
+function removeUserFromGroupAPI(userId, groupId){
+    let sendObject = {
+        group_id: groupId,
+        member_id: userId
+    }
+
+    $.ajax({
+        url: apiURL+"/groups/removeMember",
+        type: "POST",
+        data: JSON.stringify(sendObject),
+        contentType: 'application/json; charset=utf-8',
+        headers: getHeaders(),
+        success: function(resultData) {
+            console.log(resultData);
+            finishProcess();
+            alert('Se ha removido el usuario del grupo.');
+        },
+        error : function(err) {
+            console.log(err);
+            finishProcess();
+            alert('Ha ocurrido un error al eliminar el usuario del grupo. Por favor inténtalo más tarde');
         },
         timeout: defaultTimeout,
     });
@@ -638,6 +664,14 @@ function handleModalAccept(){
 
             addUserToGroupAPI(userId, groupId)
             break;
+        case 'group-removePerson':
+            //Validate field not empty, and group is selected
+            let group_id = $('#owned-groups').val();
+            let user_id = $('#user-select').val();
+            if (group_id == 'none' || user_id == 'none') return;
+
+            removeUserFromGroupAPI(user_id, group_id)
+            break;
         case "send-all":
             sendMessage(true);
             break;
@@ -737,6 +771,13 @@ $(function () {
                 break;
             case "group-addPerson":
                 $("#modalTitle").text('Añadir persona a un grupo');
+                $("#newGroupField").hide();
+                $("#textMessageField").hide();
+                $("#userListField").show();
+                $("#ownGroupListField").show();
+                break;
+            case "group-removePerson":
+                $("#modalTitle").text('Remover persona de un grupo');
                 $("#newGroupField").hide();
                 $("#textMessageField").hide();
                 $("#userListField").show();
