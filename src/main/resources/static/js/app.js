@@ -58,16 +58,24 @@ function getConvIndex(convName=''){
     return convIndex;
 }
 
-function getOwnedGroupIndex(groupName=''){
+function getOwnedGroupIndex(groupName='', groupId= 0){
     let groupIndex = -1;
     if (!user) return groupIndex;
 
     user.ownedGroups.forEach(function (group, index) {
-        if (group.name == groupName){
+        if (group.name == groupName || group.id == groupId){
             groupIndex = index;
         }
     });
     return groupIndex;
+}
+
+function updateUserToken(groupId, remove=true) {
+    let index = getOwnedGroupIndex('', groupId);
+    if (remove) {
+        user.ownedGroups.splice(index, 1);
+    }
+    sessionStorage.setItem('session-user', JSON.stringify(user));
 }
 
 //Util functions
@@ -537,6 +545,28 @@ function removeUserFromGroupAPI(userId, groupId){
     });
 }
 
+function deleteGroupAPI(groupId){
+
+    $.ajax({
+        url: apiURL+"/groups/"+groupId,
+        type: "DELETE",
+        contentType: 'application/json; charset=utf-8',
+        headers: getHeaders(),
+        success: function(resultData) {
+            console.log(resultData);
+            updateUserToken(groupId);
+            finishProcess();
+            alert('Se ha eliminado el grupo.');
+        },
+        error : function(err) {
+            console.log(err);
+            finishProcess();
+            alert('Ha ocurrido un error al eliminar el grupo. Por favor inténtalo más tarde');
+        },
+        timeout: defaultTimeout,
+    });
+}
+
 function getUsersAPI(){
     $.ajax({
         url: apiURL+"/users/",
@@ -656,6 +686,13 @@ function handleModalAccept(){
                 createGroupAPI(convName);
             }
             break;
+        case 'group-delete':
+            //Validate field not empty, and group is selected
+            let group_id_delete = $('#owned-groups').val();
+            if (group_id_delete == 'none') return;
+
+            deleteGroupAPI(group_id_delete);
+            break;
         case 'group-addPerson':
             //Validate field not empty, and group is selected
             let groupId = $('#owned-groups').val();
@@ -768,6 +805,13 @@ $(function () {
                 $("#ownGroupListField").hide();
 
                 modal.find('#group-name').val('');
+                break;
+            case "group-delete":
+                $("#modalTitle").text('Eliminar grupo');
+                $("#newGroupField").hide();
+                $("#textMessageField").hide();
+                $("#userListField").hide();
+                $("#ownGroupListField").show();
                 break;
             case "group-addPerson":
                 $("#modalTitle").text('Añadir persona a un grupo');
