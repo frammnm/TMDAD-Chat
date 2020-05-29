@@ -41,7 +41,6 @@ public class UserController {
 
     @GetMapping("/")
     @JsonView(AppViews.Public.class)
-    @PreAuthorize("authentication.getPrincipal().getRole() =='ADMIN'")
     public ResponseEntity<List<User>> getAllUsers() {
         return ResponseEntity.ok(users.findAll());
     }
