@@ -553,6 +553,7 @@ function getNewGroupAPI(groupId){
             let group = resultData;
             user.groups.push(group);
             handleNewGroup(group, false);
+            getGroupMessagesAPI(group);
             refreshMessages();
             subscribeToGroups([group]);
         },
