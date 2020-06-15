@@ -8,7 +8,10 @@ const userRoles = {
 const messageType = {
     Notice: 'Notice',
     Direct: 'Direct',
-    Group: 'Group'
+    Group: 'Group',
+    AddToGroup: 'AddToGroup',
+    RemoveFromGroup: 'RemoveFromGroup'
+
 }
 const trendingTopic = "metrics.trending";
 
@@ -173,9 +176,21 @@ function connect() {
         stompClient.subscribe('/queue/'+user.username, function (m) {
             //console.log(m);
             let message = JSON.parse(m.body);
-            message.type = messageType.Direct;
+//            message.type = messageType.Direct;
             message.received = true;
-            handleMessage(message);
+
+            if (message.type == messageType.Direct) {
+                handleMessage(message);
+            }
+
+            if (message.type == messageType.AddToGroup) {
+                console.log("Llego mensaje de agregar");
+            }
+
+            if (message.type == messageType.RemoveFromGroup) {
+                console.log("Llego mensaje de remover");
+            }
+
         }, getHeaders());
 
         //Subscribe to metrics

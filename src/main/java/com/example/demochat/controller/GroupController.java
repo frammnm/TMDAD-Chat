@@ -30,7 +30,6 @@ public class GroupController {
 
     @GetMapping("/")
     @JsonView(AppViews.Public.class)
-    @PreAuthorize("authentication.getPrincipal().getRole() =='ADMIN'")
     public  ResponseEntity<List<Group>> getAllGroups() {
         return ResponseEntity.ok(groupService.getAllGroups());
     }
