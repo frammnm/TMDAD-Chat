@@ -78,8 +78,8 @@ function getGroupIndex(groupName='', groupId= -1, owned = true){
     return groupIndex;
 }
 
-function updateUserToken(groupId = -1, groupName='', remove=true, owned = true) {
-    let index = getGroupIndex(groupName, groupId, owned);
+function updateUserToken(groupName='', remove=true, owned = true) {
+    let index = getGroupIndex(groupName, -1, owned);
 
     if (remove) {
         if (owned){
@@ -492,7 +492,8 @@ function handleNewGroup(group, active=false){
     }
 }
 
-function handleRemoveGroup(groupId = -1, groupName = '', owned = false){
+function handleRemoveGroup(groupName = '', owned = false){
+
     //Remove from conversations object
     let convIndex = getConvIndex(groupName);
     conversations.splice(convIndex, 1);
@@ -504,7 +505,7 @@ function handleRemoveGroup(groupId = -1, groupName = '', owned = false){
     }
 
     //Update user token
-    updateUserToken(groupId, groupName, true, owned);
+    updateUserToken(groupName, true, owned);
 }
 
 function getGroupMessagesAPI(group){
@@ -620,8 +621,9 @@ function deleteGroupAPI(groupId){
         contentType: 'application/json; charset=utf-8',
         headers: getHeaders(),
         success: function(resultData) {
-            console.log(resultData);
-            handleRemoveGroup(groupId, '', true);
+            let group = resultData;
+            console.log(group);
+            handleRemoveGroup(group.name, true);
             finishProcess();
             alert('Se ha eliminado el grupo.');
         },
