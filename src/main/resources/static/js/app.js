@@ -190,7 +190,7 @@ function connect() {
 
             if (message.type == messageType.RemoveFromGroup) {
                 console.log("Llego mensaje de remover");
-                handleRemoveGroup(-1, message.body);
+                handleRemoveGroup(message.body);
             }
 
         }, getHeaders());
