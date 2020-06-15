@@ -502,6 +502,11 @@ function handleRemoveGroup(groupName = '', owned = false){
         $('h5:contains(groupName)').parent().parent().remove();
     }
 
+    //Remove from dropdown
+    if (owned){
+        $('#owned-groups option').filter(function () { return $(this).html() == groupName; }).remove();
+    }
+
     //Update user token
     updateUserToken(groupName, true, owned);
 }
@@ -611,7 +616,7 @@ function removeUserFromGroupAPI(userId, groupId){
     });
 }
 
-function deleteGroupAPI(groupId){
+function deleteGroupAPI(groupId, groupName){
 
     $.ajax({
         url: apiURL+"/groups/"+groupId,
@@ -619,9 +624,8 @@ function deleteGroupAPI(groupId){
         contentType: 'application/json; charset=utf-8',
         headers: getHeaders(),
         success: function(resultData) {
-            let group = resultData;
-            console.log(group);
-            handleRemoveGroup(group.name, true);
+            console.log(resultData);
+            handleRemoveGroup(groupName, true);
             finishProcess();
             alert('Se ha eliminado el grupo.');
         },
@@ -757,8 +761,9 @@ function handleModalAccept(){
             //Validate field not empty, and group is selected
             let group_id_delete = $('#owned-groups').val();
             if (group_id_delete == 'none') return;
+            let groupName = $('#owned-groups option:selected').text();
 
-            deleteGroupAPI(group_id_delete);
+            deleteGroupAPI(group_id_delete, groupName);
             break;
         case 'group-addPerson':
             //Validate field not empty, and group is selected
