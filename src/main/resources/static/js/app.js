@@ -185,10 +185,12 @@ function connect() {
 
             if (message.type == messageType.AddToGroup) {
                 console.log("Llego mensaje de agregar");
+                getNewGroupAPI(message.body);
             }
 
             if (message.type == messageType.RemoveFromGroup) {
                 console.log("Llego mensaje de remover");
+                handleRemoveGroup(-1, message.body);
             }
 
         }, getHeaders());
@@ -498,7 +500,7 @@ function handleRemoveGroup(groupId = -1, groupName = '', owned = false){
     //Remove from html
     if (getGroupIndex(groupName, -1, owned) >= 0 ){
         console.log(groupName);
-        $('h5:contains(groupName)').parent().parent().remove();
+        $('h5:contains(' + groupName + ')').parent().parent().remove();
     }
 
     //Update user token

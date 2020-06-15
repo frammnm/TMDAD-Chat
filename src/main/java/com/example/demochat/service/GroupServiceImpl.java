@@ -102,7 +102,7 @@ public class GroupServiceImpl implements GroupService {
         }
 
         //body, sent_from, sent_to, timestamp
-        Message m = new Message(Long.toString(currentGroup.getId()), "System", user.getUsername(), "");
+        Message m = new Message(currentGroup.getName(), "System", user.getUsername(), "");
         m.setType("RemoveFromGroup");
         messageService.sendMessage(m);
 
@@ -122,7 +122,7 @@ public class GroupServiceImpl implements GroupService {
             user.setGroups(userGroups);
 
             //body, sent_from, sent_to, timestamp
-            Message m = new Message(Long.toString(currentGroup.getId()), "System", user.getUsername(), "");
+            Message m = new Message(currentGroup.getName(), "System", user.getUsername(), "");
             m.setType("RemoveFromGroup");
             messageService.sendMessage(m);
         }
