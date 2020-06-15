@@ -58,11 +58,16 @@ function getConvIndex(convName=''){
     return convIndex;
 }
 
-function getOwnedGroupIndex(groupName='', groupId= 0){
+function getGroupIndex(groupName='', groupId= -1, owned = true){
     let groupIndex = -1;
     if (!user) return groupIndex;
 
-    user.ownedGroups.forEach(function (group, index) {
+    let findGroups = user.ownedGroups;
+    if (!owned){
+        findGroups = user.groups;
+    }
+
+    findGroups.forEach(function (group, index) {
         if (group.name == groupName || group.id == groupId){
             groupIndex = index;
         }
@@ -70,10 +75,15 @@ function getOwnedGroupIndex(groupName='', groupId= 0){
     return groupIndex;
 }
 
-function updateUserToken(groupId, remove=true) {
-    let index = getOwnedGroupIndex('', groupId);
+function updateUserToken(groupId = -1, groupName='', remove=true, owned = true) {
+    let index = getGroupIndex(groupName, groupId, owned);
+
     if (remove) {
-        user.ownedGroups.splice(index, 1);
+        if (owned){
+            user.ownedGroups.splice(index, 1);
+        }else{
+            user.groups.splice(index, 1);
+        }
     }
     sessionStorage.setItem('session-user', JSON.stringify(user));
 }
@@ -370,6 +380,7 @@ function getConversationTemplate(message, active=false){
     if (message.sent_from == user.username){
         convName = message.sent_to;
     }
+
     if (message.type == messageType.Group){
         convName = message.sent_to;
         typeIcon = 'fa-users';
@@ -458,10 +469,25 @@ function handleNewGroup(group, active=false){
     let template = getConversationTemplate(message, active);
     $(".inbox-list").prepend(template);
     //If is owned, add to dropdown
-    if (getOwnedGroupIndex(group.name) >= 0 ){
+    if (getGroupIndex(group.name) >= 0 ){
         console.log(group);
         $("#owned-groups").append($("<option />").val(group.id).text(group.name));
     }
+}
+
+function handleRemoveGroup(groupId = -1, groupName = '', owned = false){
+    //Remove from conversations object
+    let convIndex = getConvIndex(groupName);
+    conversations.splice(convIndex, 1);
+
+    //Remove from html
+    if (getGroupIndex(groupName, -1, owned) >= 0 ){
+        console.log(groupName);
+        $('h5:contains(groupName)').parent().parent().remove();
+    }
+
+    //Update user token
+    updateUserToken(groupId, groupName, true, owned);
 }
 
 function getGroupMessagesAPI(group){
@@ -487,6 +513,30 @@ function getGroupMessagesAPI(group){
             console.log(err);
             finishProcess();
             //alert('Ha ocurrido un error al obtener los mensajes del grupo. Por favor inténtalo más tarde');
+        },
+
+        timeout: defaultTimeout,
+    });
+}
+
+function getNewGroupAPI(groupId){
+    $.ajax({
+        url: apiURL+"/groups/"+groupId,
+        type: "GET",
+        contentType: 'application/json; charset=utf-8',
+        headers: getHeaders(),
+        success: function(resultData) {
+            //console.log(resultData);
+            let group = resultData;
+            user.groups.push(group);
+            handleNewGroup(group, false);
+            refreshMessages();
+            subscribeToGroups([group]);
+        },
+        error : function(err) {
+            console.log(err);
+            finishProcess();
+            alert('Ha ocurrido un error al obtener el grupo. Por favor inténtalo más tarde');
         },
 
         timeout: defaultTimeout,
@@ -554,7 +604,7 @@ function deleteGroupAPI(groupId){
         headers: getHeaders(),
         success: function(resultData) {
             console.log(resultData);
-            updateUserToken(groupId);
+            handleRemoveGroup(groupId, '', true);
             finishProcess();
             alert('Se ha eliminado el grupo.');
         },
