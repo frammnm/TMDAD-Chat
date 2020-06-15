@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import org.springframework.transaction.annotation.Transactional;
+import com.example.demochat.service.MessageService;
 
 import java.util.List;
 
@@ -21,6 +22,9 @@ public class GroupServiceImpl implements GroupService {
 
     @PersistenceContext
     private EntityManager em;
+
+    @Autowired
+    private MessageService messageService;
 
     @Override
     public  List<Group> getAllGroups() {
@@ -70,6 +74,10 @@ public class GroupServiceImpl implements GroupService {
             users.save(user);
         }
 
+        //body, sent_from, sent_to, timestamp
+        Message m = new Message(Long.toString(currentGroup.getId()), "System", user.getUsername(), "");
+        m.setType("AddToGroup");
+        messageService.sendMessage(m);
         return groups.save(currentGroup);
 
     };
@@ -93,6 +101,11 @@ public class GroupServiceImpl implements GroupService {
             users.save(user);
         }
 
+        //body, sent_from, sent_to, timestamp
+        Message m = new Message(Long.toString(currentGroup.getId()), "System", user.getUsername(), "");
+        m.setType("RemoveFromGroup");
+        messageService.sendMessage(m);
+
         return groups.save(currentGroup);
 
     };
@@ -103,9 +116,15 @@ public class GroupServiceImpl implements GroupService {
 
         Group currentGroup = groups.findById(id).orElse(null);
         for (User user : currentGroup.getMembers()) {
+
             List<Group> userGroups = user.getGroups();
             userGroups.remove(currentGroup);
             user.setGroups(userGroups);
+
+            //body, sent_from, sent_to, timestamp
+            Message m = new Message(Long.toString(currentGroup.getId()), "System", user.getUsername(), "");
+            m.setType("RemoveFromGroup");
+            messageService.sendMessage(m);
         }
 
         User owner = currentGroup.getOwner();

@@ -34,7 +34,7 @@ public class Group implements Serializable {
     @JsonView(AppViews.Public.class)
     private List<Message> messages;
 
-    @ManyToMany(mappedBy = "groups", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "groups")
     @JsonView(AppViews.Internal.class)
     private List<User> members;
 
